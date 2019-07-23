@@ -24,6 +24,8 @@ class CSS_Stack {
 	 */
 	private $stack = false;
 
+	private $fonts_stack = array();
+
 	/**
 	 * Constructor for the class
 	 */
@@ -35,6 +37,7 @@ class CSS_Stack {
 		//add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
 		add_action( 'elementor/css-file/post/parse-control-property', array( $this, 'process_element' ), 10, 3 );
 		add_action( 'elementor/css-file/post/parse', array( $this, 'write_stack' ) );
+		add_action( 'elementor/css-file/post/enqueue', array( $this, 'enqueue_fonts' ) );
 		add_action( 'elementor/preview/enqueue_styles', array( $this, 'load_preview_styles' ) );
 
 	}
@@ -65,7 +68,14 @@ class CSS_Stack {
 		}
 	}
 
-
+	/**
+	 * Process single element
+	 *
+	 * @param  [type] $post_css      [description]
+	 * @param  array  $rule_data     [description]
+	 * @param  array  $controls_data [description]
+	 * @return [type]                [description]
+	 */
 	public function process_element( $post_css, $rule_data = array(), $controls_data = array() ) {
 
 		$control = $controls_data['control'];
@@ -108,7 +118,29 @@ class CSS_Stack {
 			$this->stack[ $level ] = array();
 		}
 
+		if ( false !== strpos( $rule['output_css_property'], 'font-family' ) ) {
+			$this->fonts_stack[ $level ][ $plugin ][] = $this->get_font_from_css_prop( $rule['output_css_property'] );
+		}
+
 		$this->stack[ $level ][ $plugin ][] = $rule;
+
+	}
+
+	/**
+	 * Retireieves font name from font-family property
+	 *
+	 * @param  [type] $css_property [description]
+	 * @return [type]               [description]
+	 */
+	public function get_font_from_css_prop( $css_property ) {
+
+		$found = preg_match( '/font-family: "(.*)"/', $css_property, $matches );
+
+		if ( $found ) {
+			return $matches[1];
+		} else {
+			return false;
+		}
 
 	}
 
@@ -155,6 +187,42 @@ class CSS_Stack {
 	}
 
 	/**
+	 * Enqueue saved google fonts
+	 *
+	 * @return [type] [description]
+	 */
+	public function enqueue_fonts( $post_css ) {
+
+		$hidden_rules = Plugin::instance()->db->query( array(
+			'post_id' => $post_css->get_post_id(),
+		) );
+
+		if ( empty( $hidden_rules ) ) {
+			return;
+		}
+
+		foreach ( $hidden_rules as $set ) {
+
+			$load_level = Plugin::instance()->compatibility->get_plugin_level( $set['plugin'] );
+			$visible_on = absint( $set['visible_on'] );
+
+			if ( $visible_on > $load_level ) {
+
+				$fonts = json_decode( $set['fonts'], true );
+
+				if ( ! empty( $fonts ) ) {
+					foreach ( $fonts as $font ) {
+						\Elementor\Plugin::$instance->frontend->enqueue_font( $font );
+					}
+				}
+
+			}
+
+		}
+
+	}
+
+	/**
 	 * Start new elemetns stack
 	 *
 	 * @return [type] [description]
@@ -164,6 +232,9 @@ class CSS_Stack {
 		foreach ( $this->stack as $level => $plugins ) {
 			foreach ( $plugins as $plugin => $rules ) {
 
+				$current_fonts = ! empty( $this->fonts_stack[ $level ][ $plugin ] ) ? $this->fonts_stack[ $level ][ $plugin ] : array();
+				$current_fonts = array_filter( $current_fonts );
+
 				Plugin::instance()->db->update_row(
 					array(
 						'visible_on' => $level,
@@ -172,6 +243,7 @@ class CSS_Stack {
 						'widget'     => '',
 						'skin'       => '',
 						'styles'     => json_encode( $rules ),
+						'fonts'      => json_encode( $current_fonts ),
 					),
 					array(
 						'post_id'    => $post_css->get_post_id(),

@@ -30,12 +30,19 @@ class DB {
 	public $latest_result = null;
 
 	/**
+	 * Query cache
+	 *
+	 * @var array
+	 */
+	public $cache = array();
+
+	/**
 	 * Constructor for the class
 	 */
 	public function __construct() {
 
 		if ( ! empty( $_GET['jet_sm_install_table'] ) ) {
-			add_action( 'init', array( $this, 'install_table' ) );
+			$this->install_table();
 		}
 
 	}
@@ -106,7 +113,7 @@ class DB {
 			self::wpdb()->insert(
 				self::table(),
 				$item,
-				array( '%d', '%d', '%s', '%s', '%s', '%s' )
+				array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
 			);
 		} else {
 
@@ -117,13 +124,13 @@ class DB {
 					self::table(),
 					$item,
 					$where,
-					array( '%d', '%d', '%s', '%s', '%s', '%s' )
+					array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
 				);
 			} else {
 				self::wpdb()->insert(
 					self::table(),
 					$item,
-					array( '%d', '%d', '%s', '%s', '%s', '%s' )
+					array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
 				);
 			}
 
@@ -163,6 +170,7 @@ class DB {
 			widget text,
 			skin text,
 			styles longtext,
+			fonts longtext,
 			PRIMARY KEY (ID)
 		) $charset_collate;";
 
@@ -286,7 +294,13 @@ class DB {
 	 *
 	 * @return [type] [description]
 	 */
-	public function query( $args = array(), $limit = 0, $offset = 0, $order = array(), $filter = null, $rel = 'AND' ) {
+	public function query( $args = array(), $limit = 0, $offset = 0, $order = array(), $rel = 'AND' ) {
+
+		$hash = md5( http_build_query( $args ) );
+
+		if ( isset( $this->cache[ $hash ] ) ) {
+			return $this->cache[ $hash ];
+		}
 
 		$table = self::table();
 		$query = "SELECT * FROM $table";
@@ -320,11 +334,9 @@ class DB {
 
 		$raw = self::wpdb()->get_results( $query, ARRAY_A );
 
-		if ( ! $filter ) {
-			return $raw;
-		} else {
-			return array_map( $filter, $raw );
-		}
+		$this->cache[ $hash ] = $raw;
+
+		return $raw;
 	}
 
 }
