@@ -17,43 +17,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class CSS_Stack {
 
-	/**
-	 * Current styles stack
-	 *
-	 * @var boolean
-	 */
-	private $stack = false;
-
+	private $stack       = false;
 	private $fonts_stack = array();
+	private $css_file    = null;
 
 	/**
 	 * Constructor for the class
 	 */
 	public function __construct() {
 
-		//add_filter( 'elementor/css-file/post/parsed-css-property', array( $this, 'process_current_stack' ), 10, 6 );
-
 		add_action( 'elementor/element/before_parse_css', array( $this, 'start_new_stack' ), 10, 2 );
-		//add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
-		add_action( 'elementor/css-file/post/parse-control-property', array( $this, 'process_element' ), 10, 3 );
+		add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
 		add_action( 'elementor/css-file/post/parse', array( $this, 'write_stack' ) );
 		add_action( 'elementor/css-file/post/enqueue', array( $this, 'enqueue_fonts' ) );
 		add_action( 'elementor/preview/enqueue_styles', array( $this, 'load_preview_styles' ) );
-
-	}
-
-	/**
-	 * Process current CSS stack
-	 *
-	 * @param  [type] $css             [description]
-	 * @param  [type] $parsed_selector [description]
-	 * @param  [type] $query           [description]
-	 * @param  [type] $control         [description]
-	 * @param  [type] $controls_stack  [description]
-	 * @param  [type] $file            [description]
-	 * @return [type]                  [description]
-	 */
-	public function process_current_stack( $css, $parsed_selector, $query, $control, $controls_stack, $file ) {
 
 	}
 
@@ -68,6 +45,8 @@ class CSS_Stack {
 		}
 	}
 
+
+
 	/**
 	 * Process single element
 	 *
@@ -76,7 +55,19 @@ class CSS_Stack {
 	 * @param  array  $controls_data [description]
 	 * @return [type]                [description]
 	 */
-	public function process_element( $post_css, $rule_data = array(), $controls_data = array() ) {
+	public function process_element( $post_css, $element ) {
+
+		if ( ! $this->css_file ) {
+			$this->css_file = new CSS_File( $post_css );
+		}
+
+		$this->css_file->add_controls_stack_style_rules(
+			$element,
+			$element->get_style_controls( null, $element->get_parsed_dynamic_settings() ),
+			$element->get_settings(),
+			array( '{{ID}}', '{{WRAPPER}}' ),
+			array( $element->get_id(), $post_css->get_element_unique_selector( $element ) )
+		);
 
 		$control = $controls_data['control'];
 
@@ -228,6 +219,8 @@ class CSS_Stack {
 	 * @return [type] [description]
 	 */
 	public function write_stack( $post_css ) {
+
+		die();
 
 		foreach ( $this->stack as $level => $plugins ) {
 			foreach ( $plugins as $plugin => $rules ) {
