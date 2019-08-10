@@ -3,7 +3,6 @@ namespace JET_SM;
 
 use \Elementor\Controls_Stack;
 use \Elementor\Element_Base;
-use \Elementor\Plugin;
 use \Elementor\Core\DynamicTags\Manager;
 use \Elementor\Controls_Manager;
 
@@ -18,6 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 class CSS_File extends \Elementor\Core\Files\CSS\Base {
 
 	private $parent_file;
+	private $stack;
 
 	/**
 	 * CSS file constructor.
@@ -27,8 +27,9 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @since 1.2.0
 	 * @access public
 	 */
-	public function __construct( $parent_file ) {
+	public function __construct( $parent_file, $stack ) {
 		$this->parent_file = $parent_file;
+		$this->stack       = $stack;
 		parent::__construct( $this->parent_file->get_file_name() );
 	}
 
@@ -59,9 +60,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 
 		foreach ( $controls as $control ) {
 
-			var_dump( $this->is_restricted_control( $control ) );
-
-			if ( $this->is_restricted_control( $control ) ) {
+			if ( ! $this->is_control_should_processed( $control ) ) {
 				continue;
 			}
 
@@ -86,7 +85,13 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 				continue;
 			}
 
-			$this->add_control_style_rules( $control, $parsed_dynamic_settings, $all_controls, $placeholders, $replacements );
+			$this->add_control_style_rules(
+				$control,
+				$parsed_dynamic_settings,
+				$all_controls,
+				$placeholders,
+				$replacements
+			);
 
 		}
 
@@ -107,18 +112,143 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	}
 
 	/**
-	 * Check if current control is restricted by load level
+	 * Add control rules.
+	 *
+	 * Parse the CSS for all the elements inside any given control.
+	 *
+	 * This method recursively renders the CSS for all the selectors in the control.
+	 *
+	 * @since 1.2.0
+	 * @access public
+	 *
+	 * @param array    $control        The controls.
+	 * @param array    $controls_stack The controls stack.
+	 * @param callable $value_callback Callback function for the value.
+	 * @param array    $placeholders   Placeholders.
+	 * @param array    $replacements   Replacements.
+	 */
+	public function add_control_rules( array $control, array $controls_stack, callable $value_callback, array $placeholders, array $replacements ) {
+		$value = call_user_func( $value_callback, $control );
+
+		if ( null === $value || empty( $control['selectors'] ) ) {
+			return;
+		}
+
+		foreach ( $control['selectors'] as $selector => $css_property ) {
+			try {
+				$output_css_property = preg_replace_callback( '/\{\{(?:([^.}]+)\.)?([^}| ]*)(?: *\|\| *(?:([^.}]+)\.)?([^}| ]*) *)*}}/', function( $matches ) use ( $control, $value_callback, $controls_stack, $value, $css_property ) {
+					$external_control_missing = $matches[1] && ! isset( $controls_stack[ $matches[1] ] );
+
+					$parsed_value = '';
+
+					if ( ! $external_control_missing ) {
+						$parsed_value = $this->parse_property_placeholder( $control, $value, $controls_stack, $value_callback, $matches[2], $matches[1] );
+					}
+
+					if ( '' === $parsed_value ) {
+						if ( isset( $matches[4] ) ) {
+							$parsed_value = $matches[4];
+
+							$is_string_value = preg_match( '/^([\'"])(.*)\1$/', $parsed_value, $string_matches );
+
+							if ( $is_string_value ) {
+								$parsed_value = $string_matches[2];
+							} elseif ( ! is_numeric( $parsed_value ) ) {
+								if ( $matches[3] && ! isset( $controls_stack[ $matches[3] ] ) ) {
+									return '';
+								}
+
+								$parsed_value = $this->parse_property_placeholder( $control, $value, $controls_stack, $value_callback, $matches[4], $matches[3] );
+							}
+						}
+
+						if ( '' === $parsed_value ) {
+							if ( $external_control_missing ) {
+								return '';
+							}
+
+							throw new \Exception();
+						}
+					}
+
+					return $parsed_value;
+				}, $css_property );
+			} catch ( \Exception $e ) {
+				return;
+			}
+
+			if ( ! $output_css_property ) {
+				continue;
+			}
+
+			$device_pattern = '/^(?:\([^\)]+\)){1,2}/';
+
+			preg_match( $device_pattern, $selector, $device_rules );
+
+			$query = [];
+
+			if ( $device_rules ) {
+				$selector = preg_replace( $device_pattern, '', $selector );
+
+				preg_match_all( '/\(([^\)]+)\)/', $device_rules[0], $pure_device_rules );
+
+				$pure_device_rules = $pure_device_rules[1];
+
+				foreach ( $pure_device_rules as $device_rule ) {
+					if ( Element_Base::RESPONSIVE_DESKTOP === $device_rule ) {
+						continue;
+					}
+
+					$device = preg_replace( '/\+$/', '', $device_rule );
+
+					$endpoint = $device === $device_rule ? 'max' : 'min';
+
+					$query[ $endpoint ] = $device;
+				}
+			}
+
+			$parsed_selector = str_replace( $placeholders, $replacements, $selector );
+
+			if ( ! $query && ! empty( $control['responsive'] ) ) {
+				$query = array_intersect_key( $control['responsive'], array_flip( [ 'min', 'max' ] ) );
+
+				if ( ! empty( $query['max'] ) && Element_Base::RESPONSIVE_DESKTOP === $query['max'] ) {
+					unset( $query['max'] );
+				}
+			}
+
+			$level  = absint( $control['visible_on_level'] );
+			$plugin = $control['jet_plugin'];
+
+			$this->stack->add_to_stack(
+				$level,
+				$plugin,
+				array(
+					'parsed_selector'     => $parsed_selector,
+					'output_css_property' => $output_css_property,
+					'query'               => $query,
+				)
+			);
+		}
+	}
+
+	/**
+	 * Check if current control should be processed by style manager
 	 *
 	 * @param  [type]  $control [description]
 	 * @return boolean          [description]
 	 */
-	public function is_restricted_control( $control ) {
+	public function is_control_should_processed( $control ) {
 
-		if ( empty( $control['visible_on_level'] ) ) {
+		if ( ! isset( $control['visible_on_level'] ) ) {
 			return false;
 		}
 
-		if ( empty( $control['jet_plugin'] ) ) {
+		if ( ! isset( $control['jet_plugin'] ) ) {
+			return false;
+		}
+
+		if ( ! Plugin::instance()->compatibility->is_plugin_supported( $control['jet_plugin'] ) ) {
 			return false;
 		}
 
@@ -161,7 +291,6 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @since 1.2.0
 	 * @access protected
 	 */
-	protected function render_css() {
-	}
+	protected function render_css() {}
 
 }

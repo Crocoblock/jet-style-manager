@@ -103,4 +103,102 @@ class Compatibility {
 		return $this->_plugins;
 	}
 
+	/**
+	 * Set up control arguments
+	 */
+	public function set_control_args( $control_args, $load_level, $plugin ) {
+
+		$control_args['visible_on_level'] = $load_level;
+		$control_args['jet_plugin']       = $plugin;
+
+		return $control_args;
+	}
+
+	/**
+	 * Prepare arguments for Elementor grouped controls
+	 *
+	 * @param  [type] $control_type [description]
+	 * @param  [type] $control_args [description]
+	 * @param  [type] $load_level   [description]
+	 * @param  [type] $plugin       [description]
+	 * @return [type]               [description]
+	 */
+	public function set_group_control_args( $control_type, $control_args, $load_level, $plugin ) {
+
+		$load_info = array(
+			'visible_on_level' => $load_level,
+			'jet_plugin'       => $plugin,
+		);
+
+		$new_args = array();
+
+		switch ( $control_type ) {
+
+			case 'background':
+				$new_args = array(
+					'color'             => $load_info,
+					'color_stop'        => $load_info,
+					'color_b'           => $load_info,
+					'color_b_stop'      => $load_info,
+					'gradient_type'     => $load_info,
+					'gradient_angle'    => $load_info,
+					'gradient_position' => $load_info,
+					'image'             => $load_info,
+					'position'          => $load_info,
+					'xpos'              => $load_info,
+					'ypos'              => $load_info,
+					'attachment'        => $load_info,
+					'repeat'            => $load_info,
+					'size'              => $load_info,
+					'bg_width'          => $load_info,
+					'video_link'        => $load_info,
+					'video_start'       => $load_info,
+					'video_end'         => $load_info,
+					'play_once'         => $load_info,
+					'video_fallback'    => $load_info,
+				);
+				break;
+
+			case 'box-shadow':
+				$new_args = array(
+					'box_shadow'          => $load_info,
+					'box_shadow_position' => $load_info,
+				);
+				break;
+
+			case 'border':
+				$new_args = array(
+					'width'  => $load_info,
+					'border' => $load_info,
+					'color'  => $load_info,
+				);
+				break;
+
+			case 'typography':
+				$new_args = array(
+					'font_size'       => $load_info,
+					'font_family'     => $load_info,
+					'font_weight'     => $load_info,
+					'text_transform'  => $load_info,
+					'text_decoration' => $load_info,
+					'line_height'     => $load_info,
+					'letter_spacing'  => $load_info,
+				);
+				break;
+
+		}
+
+		if ( ! empty( $new_args ) ) {
+
+			if ( empty( $control_args['fields_options'] ) ) {
+				$control_args['fields_options'] = array();
+			}
+
+			$control_args['fields_options'] = array_merge_recursive( $control_args['fields_options'], $new_args );
+		}
+
+		return $control_args;
+
+	}
+
 }

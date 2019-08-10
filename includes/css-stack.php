@@ -58,7 +58,7 @@ class CSS_Stack {
 	public function process_element( $post_css, $element ) {
 
 		if ( ! $this->css_file ) {
-			$this->css_file = new CSS_File( $post_css );
+			$this->css_file = new CSS_File( $post_css, $this );
 		}
 
 		$this->css_file->add_controls_stack_style_rules(
@@ -68,27 +68,6 @@ class CSS_Stack {
 			array( '{{ID}}', '{{WRAPPER}}' ),
 			array( $element->get_id(), $post_css->get_element_unique_selector( $element ) )
 		);
-
-		$control = $controls_data['control'];
-
-		if ( empty( $control['visible_on_level'] ) ) {
-			return;
-		}
-
-		if ( empty( $control['jet_plugin'] ) ) {
-			return;
-		}
-
-		$level  = absint( $control['visible_on_level'] );
-		$plugin = $control['jet_plugin'];
-
-		if ( Plugin::instance()->compatibility->is_plugin_supported( $plugin ) ) {
-			$this->add_to_stack(
-				$level,
-				$plugin,
-				$rule_data
-			);
-		}
 
 	}
 
@@ -106,7 +85,7 @@ class CSS_Stack {
 		}
 
 		if ( empty( $this->stack[ $level ][ $plugin ] ) ) {
-			$this->stack[ $level ] = array();
+			$this->stack[ $level ][ $plugin ] = array();
 		}
 
 		if ( false !== strpos( $rule['output_css_property'], 'font-family' ) ) {
@@ -173,19 +152,23 @@ class CSS_Stack {
 
 		}
 
+		$this->enqueue_hidden_fonts( $post_id );
+		\Elementor\Plugin::$instance->frontend->print_fonts_links();
+
 		printf( '<style>%s</style>', $stylesheet_obj->__toString() );
 
 	}
 
 	/**
-	 * Enqueue saved google fonts
+	 * Enqueue hidden fonts for given post ID
 	 *
-	 * @return [type] [description]
+	 * @param  [type] $post_id [description]
+	 * @return [type]          [description]
 	 */
-	public function enqueue_fonts( $post_css ) {
+	public function enqueue_hidden_fonts( $post_id ) {
 
 		$hidden_rules = Plugin::instance()->db->query( array(
-			'post_id' => $post_css->get_post_id(),
+			'post_id' => $post_id,
 		) );
 
 		if ( empty( $hidden_rules ) ) {
@@ -214,19 +197,27 @@ class CSS_Stack {
 	}
 
 	/**
+	 * Enqueue saved google fonts
+	 *
+	 * @return [type] [description]
+	 */
+	public function enqueue_fonts( $post_css ) {
+		$this->enqueue_hidden_fonts( $post_css->get_post_id() );
+	}
+
+	/**
 	 * Start new elemetns stack
 	 *
 	 * @return [type] [description]
 	 */
 	public function write_stack( $post_css ) {
 
-		die();
-
 		foreach ( $this->stack as $level => $plugins ) {
 			foreach ( $plugins as $plugin => $rules ) {
 
 				$current_fonts = ! empty( $this->fonts_stack[ $level ][ $plugin ] ) ? $this->fonts_stack[ $level ][ $plugin ] : array();
 				$current_fonts = array_filter( $current_fonts );
+				$current_fonts = array_unique( $current_fonts );
 
 				Plugin::instance()->db->update_row(
 					array(
@@ -241,6 +232,7 @@ class CSS_Stack {
 					array(
 						'post_id'    => $post_css->get_post_id(),
 						'visible_on' => $level,
+						'plugin'     => $plugin,
 					)
 				);
 			}
