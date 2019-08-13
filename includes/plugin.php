@@ -27,6 +27,7 @@ class Plugin {
 	public $db;
 	public $styles_handler;
 	public $compatibility;
+	public $skins;
 
 	/**
 	 * Instance.
@@ -68,6 +69,7 @@ class Plugin {
 		$this->db            = new DB();
 		$this->css_stack     = new CSS_Stack();
 		$this->compatibility = new Compatibility();
+		$this->skins         = new Skins();
 	}
 
 	/**
