@@ -27,10 +27,24 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @since 1.2.0
 	 * @access public
 	 */
-	public function __construct( $parent_file, $stack ) {
-		$this->parent_file = $parent_file;
+	public function __construct( $stack = null, $parent_file = null ) {
+
 		$this->stack       = $stack;
-		parent::__construct( $this->parent_file->get_file_name() );
+		$this->parent_file = $parent_file;
+
+		parent::__construct( $this->get_file_name() );
+	}
+
+	/**
+	 * Returns fil name
+	 * @return [type] [description]
+	 */
+	public function get_file_name() {
+		if ( $this->parent_file ) {
+			return $this->parent_file->get_file_name();
+		} else {
+			return $this->get_file_handle_id();
+		}
 	}
 
 	/**
@@ -100,14 +114,30 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 
 				$element_settings = $ch_element->get_settings();
 
+				Plugin::instance()->skins->add_skin_to_rendered( $ch_element );
+
 				$this->add_controls_stack_style_rules(
 					$ch_element,
 					$ch_element->get_style_controls( null, $ch_element->get_parsed_dynamic_settings() ),
 					$element_settings,
 					array( '{{ID}}', '{{WRAPPER}}' ),
-					array( $ch_element->get_id(), $this->parent_file->get_element_unique_selector( $ch_element ) )
+					array( $ch_element->get_id(), $this->get_element_unique_selector( $ch_element ) )
 				);
 			}
+		}
+	}
+
+	/**
+	 * Returns unique selector name for the element
+	 *
+	 * @param  [type] $element [description]
+	 * @return [type]          [description]
+	 */
+	public function get_element_unique_selector( $element ) {
+		if ( $this->parent_file ) {
+			return $this->parent_file->get_element_unique_selector( $element );
+		} else {
+			return '.elementor .elementor-inner .elementor-element' . $element->get_unique_selector();
 		}
 	}
 
@@ -128,6 +158,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @param array    $replacements   Replacements.
 	 */
 	public function add_control_rules( array $control, array $controls_stack, callable $value_callback, array $placeholders, array $replacements ) {
+
 		$value = call_user_func( $value_callback, $control );
 
 		if ( null === $value || empty( $control['selectors'] ) ) {
@@ -253,6 +284,16 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns post ID
+	 * Fallback to compatibility with Post_CSS instance.
+	 *
+	 * @return [type] [description]
+	 */
+	public function get_post_id() {
+		return false;
 	}
 
 	/**

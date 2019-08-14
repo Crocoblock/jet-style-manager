@@ -1,0 +1,143 @@
+#jet-sm-skins-modal {
+	.dialog-widget-content {
+		font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
+		background-color: #f1f3f5;
+		width: 100%;
+	}
+	@media (max-width: 1439px) {
+		.dialog-widget-content {
+			max-width: 990px;
+		}
+	}
+	@media (min-width: 1440px) {
+		.dialog-widget-content {
+			max-width: 1200px;
+		}
+	}
+
+	.dialog-lightbox-header {
+		padding: 10px 0;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		height: 50px;
+	}
+
+	.jet-sm-popup-actions {
+		flex: 0 0 100%;
+		padding: 0 0 30px;
+	}
+
+	.jet-sm-popup-heading {
+		font-size: 30px;
+	}
+
+	.jet-sm-popup-sub-heading {
+		font-size: 18px;
+		color: #a4afb7;
+		margin-top: 15px;
+		font-weight: 300;
+	}
+
+	.jet-sm-save-skin {
+		padding: 60px 30px 60px;
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		input[type="text"] {
+			background: #fff;
+			padding: 15px 20px;
+			border: none;
+			max-width: 350px;
+		}
+		button {
+			padding: 15px 25px;
+			margin: 0 0 0 10px;
+		}
+	}
+
+	.dialog-header {
+		background-color: #fff;
+		-webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		position: relative;
+		z-index: 1;
+	}
+
+	.dialog-buttons-wrapper {
+		background-color: #fff;
+		border: none;
+		display: none;
+		justify-content: flex-end;
+		padding: 5px;
+		box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+		position: relative;
+	}
+	.elementor-templates-modal .dialog-message {
+		height: 750px;
+		max-height: 85vh;
+		overflow: auto;
+		padding-top: 25px;
+	}
+
+	.dialog-content {
+		height: 100%;
+	}
+
+	.dialog-loading {
+		display: none;
+	}
+
+	.jet-sm-skins {
+		padding: 40px 0;
+		&__loading,
+		&__not-found {
+			padding: 20px 0;
+			text-align: center;
+			font-size: 18px;
+			color: #a4afb7;
+			margin-top: 15px;
+			font-weight: 300;
+		}
+		&__table {
+			width: 100%;
+			table-layout: fixed;
+			border-collapse: collapse;
+			tr {
+				th {
+					text-transform: uppercase;
+				}
+				th,
+				td {
+					padding: 15px 20px;
+					border: none;
+					width: 200px;
+					text-align: left;
+					&:first-child {
+						width: auto;
+					}
+				}
+			}
+			tbody {
+				background: #fff;
+				box-shadow: 1px 1px 20px 0 rgba(0, 0, 0, 0.03);
+				tr {
+					border-top: 1px solid #f1f3f5;
+					&:first-child {
+						border-top: none;
+					}
+					button.jet-sm-apply-skin {
+						padding: 8px 15px;
+						margin: 0 10px 0 0;
+					}
+					a.jet-sm-delete-skin {
+						color: #D30C5C;
+						&:hover {
+							text-decoration: underline;
+						}
+					}
+				}
+			}
+		}
+	}
+}

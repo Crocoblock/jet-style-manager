@@ -32,9 +32,16 @@ class CSS_Render {
 	 * @return [type] [description]
 	 */
 	public function load_preview_styles() {
+
 		$post_id = get_the_ID();
-		$this->render_styles( $post_id, null, true );
-		$this->enqueue_hidden_fonts( $post_id );
+		ob_start();
+		$this->render_styles( array( 'post_id' => $post_id ), null, true );
+		$css = ob_get_clean();
+		$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
+
+		echo $css;
+
+		$this->enqueue_hidden_fonts( array( 'post_id' => $post_id ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
 	}
 
@@ -44,11 +51,9 @@ class CSS_Render {
 	 * @param  [type] $post_id [description]
 	 * @return [type]          [description]
 	 */
-	public function enqueue_hidden_fonts( $post_id ) {
+	public function enqueue_hidden_fonts( $query, $query_rel = 'AND' ) {
 
-		$hidden_rules = Plugin::instance()->db->query( array(
-			'post_id' => $post_id,
-		) );
+		$hidden_rules = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
 
 		if ( empty( $hidden_rules ) ) {
 			return;
@@ -81,17 +86,15 @@ class CSS_Render {
 	 * @return [type] [description]
 	 */
 	public function enqueue_fonts( $post_css ) {
-		$this->enqueue_hidden_fonts( $post_css->get_post_id() );
+		$this->enqueue_hidden_fonts( array( 'post_id' => $post_css->get_post_id() ) );
 	}
 
 	/**
 	 * Render styles using internal or external stylesheet object
 	 */
-	public function render_styles( $post_id = 0, $stylesheet_obj = null, $inline = false ) {
+	public function render_styles( $query = array(), $stylesheet_obj = null, $inline = false, $query_rel = 'AND' ) {
 
-		$hidden_rules = Plugin::instance()->db->query( array(
-			'post_id' => $post_id,
-		) );
+		$hidden_rules = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
 
 		if ( empty( $hidden_rules ) ) {
 			return;
@@ -133,6 +136,15 @@ class CSS_Render {
 		if ( $inline ) {
 			printf( '<style>%s</style>', $stylesheet_obj->__toString() );
 		}
+
+	}
+
+	/**
+	 * Render skin related styles
+	 *
+	 * @return [type] [description]
+	 */
+	public function render_skin_styles() {
 
 	}
 

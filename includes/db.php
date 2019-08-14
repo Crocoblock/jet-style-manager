@@ -218,17 +218,18 @@ class DB {
 	 * @param array  $args [description]
 	 * @param string $rel  [description]
 	 */
-	public function add_where_args( $args = array(), $rel = 'AND' ) {
+	public function add_where_args( $args = array(), $rel = 'AND', $plain = false ) {
 
 		$query      = '';
 		$multi_args = false;
 
 		if ( ! empty( $args ) ) {
 
-			$query  .= ' WHERE ';
-			$glue    = '';
-			$search  = array();
-			$props   = array();
+			if ( ! $plain ) {
+				$query .= ' WHERE ';
+			}
+
+			$glue = '';
 
 			if ( count( $args ) > 1 ) {
 				$multi_args = true;
@@ -252,7 +253,11 @@ class DB {
 				}
 
 				if ( is_array( $value ) ) {
-					$query .= sprintf( '( %s )', $this->get_sub_query( $key, $value, $format ) );
+					if ( is_numeric( $key ) ) {
+						$query .= sprintf( '( %s )', $this->add_where_args( $value, 'AND', true ) );
+					} else {
+						$query .= sprintf( '( %s )', $this->get_sub_query( $key, $value, $format ) );
+					}
 				} else {
 					$query .= sprintf( $format, esc_sql( $key ), esc_sql( $value ) );
 				}
@@ -303,22 +308,16 @@ class DB {
 		}
 
 		$table = self::table();
-		$query = "SELECT * FROM $table";
+
+		if ( empty( $args['__select'] ) ) {
+			$query = "SELECT * FROM $table";
+		} else {
+			$query = "SELECT " . $args['__select'] . " FROM $table";
+			unset( $args['__select'] );
+		}
 
 		if ( ! $rel ) {
 			$rel = 'AND';
-		}
-
-		if ( isset( $args['after'] ) ) {
-			$after = $args['after'];
-			unset( $args['after'] );
-			$args['ID>'] = $after;
-		}
-
-		if ( isset( $args['before'] ) ) {
-			$before = $args['before'];
-			unset( $args['before'] );
-			$args['ID<'] = $before;
 		}
 
 		$query .= $this->add_where_args( $args, $rel );
@@ -329,8 +328,6 @@ class DB {
 			$offset = absint( $offset );
 			$query .= " LIMIT $offset, $limit";
 		}
-
-		//var_dump( $query );
 
 		$raw = self::wpdb()->get_results( $query, ARRAY_A );
 

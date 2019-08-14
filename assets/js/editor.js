@@ -2,22 +2,16 @@
 
 	'use strict';
 
-	var JetSM = {
+	window.JetSM = {
 		modal: null,
-		getModal: function() {
-
-			if ( ! this.modal ) {
-				this.modal = window.elementor.dialogsManager.createWidget( 'lightbox', {
-					id: 'jet-sm-skins-modal',
-					closeButton: true
-				} );
-			}
-
-			return this.modal;
-
-		},
+		currentElement: null,
 		init: function() {
-			var self = this;
+
+			$( document )
+				.on( 'click', '.jet-sm-popup-close', JetSM.hidePopup )
+				.on( 'click', '#jet-sm-save-skin', JetSM.saveSkin )
+				.on( 'click', '.jet-sm-apply-skin', JetSM.applySkin );
+
 			window.elementor.hooks.addFilter( 'elements/widget/contextMenuGroups', function( groups, element ) {
 
 				groups.push( {
@@ -35,17 +29,161 @@
 						icon: 'eicon-arrow-down',
 						title: 'Apply Skin',
 						isVisible: true,
-						callback: JetSM.applySkin.bind( { element: element } )
+						callback: JetSM.applySkinPopup.bind( { element: element } )
 					}]
 				} );
 
 				return groups;
 			} );
 		},
-		showSkinsPopup: function() {
-			JetSM.getModal().show();
+		getModal: function() {
+
+			if ( ! this.modal ) {
+
+				this.modal = window.elementor.dialogsManager.createWidget( 'lightbox', {
+					id: 'jet-sm-skins-modal',
+					closeButton: true
+				} );
+
+				this.modal.setHeaderMessage( '<div class="jet-sm-popup-close elementor-templates-modal__header__close elementor-templates-modal__header__close--normal elementor-templates-modal__header__item"><i class="eicon-close" aria-hidden="true" title="Close"></i><span class="elementor-screen-only">Close</span></div>' );
+			}
+
+			return this.modal;
+
+		},
+		saveSkin: function() {
+
+			if ( ! JetSM.currentElement ) {
+				// TODO: show error
+				return;
+			}
+
+			var skinName = $( '#jet-sm-skin-name' ).val(),
+				settings = JetSM.currentElement.controlsCSSParser.getSettings(),
+				values   = settings.settingsModel.attributes,
+				widget   = JetSM.currentElement.model.attributes.widgetType;
+
+			for ( var control in values ) {
+				if ( values[ control ].model && values[ control ].models ) {
+					delete( values[ control ] );
+				}
+			}
+
+			$.ajax({
+				url: window.ajaxurl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'jet_sm_save_skin',
+					name: skinName,
+					widget: widget,
+					values: values,
+				},
+			}).done( function() {
+				JetSM.hidePopup();
+			}).fail( function() {
+				// TODO: show error
+			});
+
 		},
 		applySkin: function() {
+
+			if ( ! JetSM.currentElement ) {
+				// TODO: show error
+				return;
+			}
+
+			var $button  = $( this ),
+				skinName = $button.attr( 'data-skin' );
+
+			$.ajax({
+				url: window.ajaxurl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'jet_sm_apply_skin',
+					name: skinName,
+					widget: JetSM.currentElement.model.attributes.widgetType,
+				},
+			}).done( function( response ) {
+				if ( response.success ) {
+
+					var editModel = window.JetSM.currentElement.getEditModel();
+
+					editModel.setSetting( {
+						jet_sm_skin: skinName,
+					} );
+
+					JetSM.currentElement.el.classList.add( response.data.class_name );
+					window.elementor.$preview.contents().find( 'head' ).append( response.data.css );
+					window.elementor.saver.setFlagEditorChange( true );
+
+					JetSM.hidePopup();
+				}
+			}).fail( function() {
+				// TODO: show error
+			});
+
+		},
+		hidePopup: function() {
+			JetSM.currentElement = null;
+			JetSM.getModal().hide();
+			JetSM.getModal().setMessage( '' );
+		},
+		showSkinsPopup: function() {
+
+			var modal = JetSM.getModal();
+
+			JetSM.currentElement = this.element;
+
+			modal.setMessage( '<div class="jet-sm-save-skin"><div class="jet-sm-popup-actions"><div class="jet-sm-popup-heading">Save current widget styling as skin</div><div class="jet-sm-popup-sub-heading">You\'ll be able to apply this skin to any widget of the same type.</div></div><input type="text" id="jet-sm-skin-name"><button id="jet-sm-save-skin" class="elementor-button elementor-button-success"><span class="elementor-state-icon"><i class="eicon-loading eicon-animation-spin" aria-hidden="true"></i></span>Save</button></div>' );
+
+			modal.show();
+
+		},
+		applySkinPopup: function() {
+
+			var modal = JetSM.getModal();
+
+			JetSM.currentElement = this.element;
+
+			modal.setMessage( '<div class="jet-sm-skins__loading">Loading skins...</div>' );
+			modal.show();
+
+			$.ajax({
+				url: window.ajaxurl,
+				type: 'GET',
+				dataType: 'json',
+				data: {
+					action: 'jet_sm_get_skins_for_widget',
+					widget: JetSM.currentElement.model.attributes.widgetType,
+				},
+			}).done( function( response ) {
+
+				var modalMessage = null;
+
+				modalMessage = '<div class="jet-sm-skins">';
+
+				if ( response.data.skins.length ) {
+					modalMessage += '<table class="jet-sm-skins__table"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>';
+
+					response.data.skins.forEach( function( skin ) {
+						modalMessage += '<tr><td>' + skin.skin + '</td><td><button type="button" class="elementor-button elementor-button-success jet-sm-apply-skin" data-skin="' + skin.skin + '">Apply</button><a href="#" class="jet-sm-delete-skin" data-skin="' + skin.skin + '">Delete</a></td></tr>';
+					});
+
+					modalMessage += '</tbody></table>';
+				} else {
+					modalMessage += '<div class="jet-sm-skins__not-found">No skins found for this widget</div>';
+				}
+
+				modalMessage += '</div>';
+
+				modal.setMessage( modalMessage );
+				modal.refreshPosition();
+
+			}).fail( function() {
+				// TODO: show error
+			});
 
 		},
 	};
