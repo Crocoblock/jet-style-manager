@@ -33,6 +33,19 @@ class Skins {
 			'elementor/widget/before_render_content',
 			array( $this, 'set_skin_class' )
 		);
+
+		add_action( 'elementor/editor/after_enqueue_scripts', array( $this, 'localize_skins' ) );
+
+	}
+
+	/**
+	 * Print localized skins
+	 *
+	 * @return [type] [description]
+	 */
+	public function localize_skins() {
+		$script = "var JetSMRenderedSkins = " . wp_json_encode( $this->rendered_skins ) . ';';
+		printf( "<script type='text/javascript'>\n%s\n</script>\n", $script );
 	}
 
 	/**
@@ -42,14 +55,14 @@ class Skins {
 	 */
 	public function set_skin_class( $widget ) {
 
-		$skin = $this->add_skin_to_rendered( $widget );
+		$skin_data = $this->add_skin_to_rendered( $widget );
 
-		if ( $skin ) {
+		if ( ! empty( $skin_data ) ) {
 			$widget->add_render_attribute(
 				'_wrapper',
 				'class',
 				array(
-					$this->get_skin_class_name( $skin, $widget->get_name() )
+					$skin_data['class_name']
 				)
 			);
 		}
@@ -64,15 +77,20 @@ class Skins {
 	public function add_skin_to_rendered( $element ) {
 
 		$skin = $element->get_settings( 'jet_sm_skin' );
+		$data = array();
 
 		if ( $skin ) {
 
-			$this->rendered_skins[] = array(
-				'skin'   => $skin,
-				'widget' => $element->get_name(),
+			$data = array(
+				'id'         => $element->get_id(),
+				'skin'       => $skin,
+				'widget'     => $element->get_name(),
+				'class_name' => $this->get_skin_class_name( $skin, $element->get_name() )
 			);
 
-			return $skin;
+			$this->rendered_skins[] = $data;
+
+			return $data;
 		} else {
 			return false;
 		}
@@ -115,8 +133,51 @@ class Skins {
 		add_action( 'wp_ajax_jet_sm_save_skin', array( $this, 'save_skin' ) );
 		add_action( 'wp_ajax_jet_sm_get_skins_for_widget', array( $this, 'get_skins_for_widget' ) );
 		add_action( 'wp_ajax_jet_sm_apply_skin', array( $this, 'apply_skin' ) );
+		add_action( 'wp_ajax_jet_sm_load_skins_css', array( $this, 'load_preview_skin_css' ) );
 	}
 
+	/**
+	 * Load preview CSS
+	 * @return [type] [description]
+	 */
+	public function load_preview_skin_css() {
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'You don\'t have permissions to do this' ) );
+		}
+
+		$skins = $_REQUEST['skins'] ? json_decode( wp_unslash( $_REQUEST['skins'] ), true ) : array();
+		$skins = array_map( function( $item ) {
+
+			$whitelisted_item = array(
+				'skin'   => $item['skin'],
+				'widget' => $item['widget'],
+			);
+
+			return $whitelisted_item;
+
+		}, $skins );
+
+		$query_relation = 'OR';
+
+		$render = new CSS_Render();
+
+		ob_start();
+		$render->render_styles( $skins, false, true, $query_relation );
+		$render->enqueue_hidden_fonts( $skins, $query_relation );
+		$css = ob_get_clean();
+		$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
+
+		wp_send_json_success( array(
+			'css' => $css,
+		) );
+	}
+
+	/**
+	 * Apply skin for selected widget
+	 *
+	 * @return [type] [description]
+	 */
 	public function apply_skin() {
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
@@ -184,7 +245,7 @@ class Skins {
 
 		$widget   = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
 		$name     = $_REQUEST['name'] ? esc_attr( $_REQUEST['name'] ) : false;
-		$settings = $_REQUEST['values'] ? $_REQUEST['values'] : array();
+		$settings = $_REQUEST['values'] ? json_decode( wp_unslash( $_REQUEST['values'] ), true ) : array();
 
 		$element_type = \Elementor\Plugin::$instance->widgets_manager->get_widget_types( $widget );
 

@@ -15,10 +15,11 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class CSS_Stack {
 
-	private $stack       = false;
-	private $fonts_stack = array();
-	private $css_file    = null;
-	private $render      = null;
+	private $stack           = false;
+	private $fonts_stack     = array();
+	private $css_file        = null;
+	private $render          = null;
+	private $processed_files = array();
 
 	/**
 	 * Constructor for the class
@@ -31,6 +32,12 @@ class CSS_Stack {
 		add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
 		add_action( 'elementor/css-file/post/parse', array( $this, 'process_stack' ) );
 
+		add_action( 'elementor/document/after_save', array( $this, 'reset_stack' ) );
+
+	}
+
+	public function reset_stack( $document ) {
+		delete_post_meta( $document->get_main_id(), '_jet_sm_is_processed' );
 	}
 
 	/**
@@ -38,7 +45,25 @@ class CSS_Stack {
 	 *
 	 * @return [type] [description]
 	 */
-	public function start_new_stack() {
+	public function start_new_stack( $post_css = null ) {
+
+		if ( $post_css ) {
+
+			$post_id = $post_css->get_post_id();
+
+			if ( in_array( $post_id, $this->processed_files ) ) {
+				return;
+			}
+
+			$this->processed_files[] = $post_id;
+			$is_processed = get_post_meta( $post_id, '_jet_sm_is_processed', true );
+
+			if ( $is_processed ) {
+				return;
+			}
+
+		}
+
 		if ( false === $this->stack ) {
 			$this->stack = array();
 		}
@@ -66,6 +91,10 @@ class CSS_Stack {
 	 * @return [type]                [description]
 	 */
 	public function process_element( $post_css = null, $element = null ) {
+
+		if ( false === $this->stack ) {
+			return;
+		}
 
 		$css_file = $this->get_css_file( $post_css );
 
@@ -141,13 +170,14 @@ class CSS_Stack {
 			$post_css = $this->get_css_file();
 		}
 
+		$post_id = $post_css->get_post_id();
+
 		foreach ( $this->stack as $level => $plugins ) {
 			foreach ( $plugins as $plugin => $rules ) {
 
 				$current_fonts = ! empty( $this->fonts_stack[ $level ][ $plugin ] ) ? $this->fonts_stack[ $level ][ $plugin ] : array();
 				$current_fonts = array_filter( $current_fonts );
 				$current_fonts = array_unique( $current_fonts );
-				$post_id       = $post_css->get_post_id();
 
 				$where = array(
 					'visible_on' => $level,
@@ -181,6 +211,12 @@ class CSS_Stack {
 			}
 		}
 
+		$this->stack = false;
+
+		if ( $post_id ) {
+			update_post_meta( $post_id, '_jet_sm_is_processed', 1 );
+		}
+
 	}
 
 	/**
@@ -198,6 +234,18 @@ class CSS_Stack {
 			$query          = array( 'post_id' => $post_css->get_post_id() );
 			$query_relation = 'AND';
 		} else {
+
+			$skins = array_map( function( $item ) {
+
+				$whitelisted_item = array(
+					'skin'   => $item['skin'],
+					'widget' => $item['widget'],
+				);
+
+				return $whitelisted_item;
+
+			}, $skins );
+
 			$query          = array_merge( array( 'post_id' => $post_css->get_post_id() ), $skins );
 			$query_relation = 'OR';
 		}

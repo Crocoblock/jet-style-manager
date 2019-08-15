@@ -34,6 +34,7 @@ class CSS_Render {
 	public function load_preview_styles() {
 
 		$post_id = get_the_ID();
+
 		ob_start();
 		$this->render_styles( array( 'post_id' => $post_id ), null, true );
 		$css = ob_get_clean();

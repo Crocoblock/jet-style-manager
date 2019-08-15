@@ -30,11 +30,68 @@
 						title: 'Apply Skin',
 						isVisible: true,
 						callback: JetSM.applySkinPopup.bind( { element: element } )
+					}, {
+						name: 'jet_sm_skins_reset',
+						icon: 'eicon-close',
+						title: 'Reset Skin',
+						isVisible: true,
+						callback: JetSM.resetSkin.bind( { element: element } )
 					}]
 				} );
 
 				return groups;
 			} );
+
+			window.elementor.on( 'preview:loaded', function() {
+
+				if ( ! window.JetSMRenderedSkins.length ) {
+					return;
+				}
+
+				var $previewBody = window.elementor.$preview.contents();
+
+				$.ajax({
+					url: window.ajaxurl,
+					type: 'POST',
+					dataType: 'json',
+					data: {
+						action: 'jet_sm_load_skins_css',
+						skins: JSON.stringify( window.JetSMRenderedSkins ),
+					},
+				}).done( function( response ) {
+					$previewBody.find( 'head' ).append( response.data.css );
+				}).fail( function() {
+					// TODO: show error
+				});
+
+				window.JetSMRenderedSkins.forEach( function( element ) {
+					$previewBody.find( 'div[data-id="' + element.id + '"]' ).addClass( element.class_name );
+				} );
+
+			} );
+
+		},
+		removeSkinClass: function( $el ) {
+
+			var classes = $el.attr( 'class' ).split( /\s+/ );
+
+			classes.forEach( function( className ) {
+				if ( className.includes( 'elementor-element-skin-' ) ) {
+					$el.removeClass( className );
+				}
+			} );
+		},
+		resetSkin: function() {
+			var editModel = this.element.getEditModel(),
+				skin      = editModel.getSetting( 'jet_sm_skin' );
+
+			if ( ! skin ) {
+				return;
+			}
+
+			JetSM.removeSkinClass( this.element.$el );
+			window.elementor.saver.setFlagEditorChange( true );
+
 		},
 		getModal: function() {
 
@@ -77,7 +134,7 @@
 					action: 'jet_sm_save_skin',
 					name: skinName,
 					widget: widget,
-					values: values,
+					values: JSON.stringify( values ),
 				},
 			}).done( function() {
 				JetSM.hidePopup();
@@ -114,7 +171,9 @@
 						jet_sm_skin: skinName,
 					} );
 
+					JetSM.removeSkinClass( JetSM.currentElement.$el );
 					JetSM.currentElement.el.classList.add( response.data.class_name );
+
 					window.elementor.$preview.contents().find( 'head' ).append( response.data.css );
 					window.elementor.saver.setFlagEditorChange( true );
 
