@@ -259,7 +259,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 			$plugin = $control['jet_plugin'];
 
 			$this->stack->add_to_stack(
-				$this->parent_file->get_post_id(),
+				$this->get_post_id(),
 				$level,
 				$plugin,
 				array(
@@ -301,7 +301,11 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @return [type] [description]
 	 */
 	public function get_post_id() {
-		return false;
+		if ( $this->parent_file ) {
+			return $this->parent_file->get_post_id();
+		} else {
+			return false;
+		}
 	}
 
 	/**

@@ -18,12 +18,20 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class CSS_Render {
 
+	const FONTS_META_KEY = '_jet_sm_fonts_cache';
+
 	/**
 	 * Constructor for the class
 	 */
 	public function __construct() {
 		add_action( 'elementor/css-file/post/enqueue', array( $this, 'enqueue_fonts' ) );
 		add_action( 'elementor/preview/enqueue_styles', array( $this, 'load_preview_styles' ) );
+
+		add_action( 'jet-styles-manager/css-stack/reset', array( $this, 'reset_fonts_cache' ) );
+	}
+
+	public function reset_fonts_cache( $post_id ) {
+		delete_post_meta( $post_id, self::FONTS_META_KEY );
 	}
 
 	/**
@@ -55,13 +63,26 @@ class CSS_Render {
 	 */
 	public function enqueue_hidden_fonts( $query, $query_rel = 'AND' ) {
 
+		$post_id = ! empty( $query['post_id'] ) ? $query['post_id'] : get_the_ID();
+		$fonts   = $this->get_cached_fonts( $post_id, $query );
+
+		if ( false !== $fonts ) {
+			foreach ( $fonts as $font ) {
+				\Elementor\Plugin::$instance->frontend->enqueue_font( $font );
+			}
+			return;
+		}
+
 		$query['__select'] = ' `plugin`, `visible_on`, `fonts` ';
 
 		$hidden_rules = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
 
 		if ( empty( $hidden_rules ) ) {
+			$this->update_fonts_cache( $post_id, $query, array() );
 			return;
 		}
+
+		$cache = array();
 
 		foreach ( $hidden_rules as $set ) {
 
@@ -74,6 +95,11 @@ class CSS_Render {
 
 				if ( ! empty( $fonts ) ) {
 					foreach ( $fonts as $font ) {
+
+						if ( ! in_array( $font, $cache ) ) {
+							$cache[] = $font;
+						}
+
 						\Elementor\Plugin::$instance->frontend->enqueue_font( $font );
 					}
 				}
@@ -81,6 +107,58 @@ class CSS_Render {
 			}
 
 		}
+
+		$this->update_fonts_cache( $post_id, $query, $cache );
+
+	}
+
+	/**
+	 * Update cached fonts
+	 *
+	 * @param  [type] $post_id [description]
+	 * @param  [type] $query   [description]
+	 * @param  [type] $cache   [description]
+	 * @return [type]          [description]
+	 */
+	public function get_cached_fonts( $post_id = 0, $query = array() ) {
+
+		$hash = md5( http_build_query( $query ) );
+		$meta = get_post_meta( $post_id, self::FONTS_META_KEY, true );
+
+		if ( empty( $meta ) ) {
+			return false;
+		} elseif ( ! isset( $meta[ $hash ] ) ) {
+			return false;
+		} else {
+			return $meta[ $hash ];
+		}
+
+	}
+
+	/**
+	 * Update cached fonts
+	 *
+	 * @param  [type] $post_id [description]
+	 * @param  [type] $query   [description]
+	 * @param  [type] $cache   [description]
+	 * @return [type]          [description]
+	 */
+	public function update_fonts_cache( $post_id = 0, $query = array(), $cache = array() ) {
+
+		if ( isset( $query['__select'] ) ) {
+			unset( $query['__select'] );
+		}
+
+		$hash = md5( http_build_query( $query ) );
+		$meta = get_post_meta( $post_id, self::FONTS_META_KEY, true );
+
+		if ( empty( $meta ) ) {
+			$meta = array();
+		}
+
+		$meta[ $hash ] = $cache;
+
+		update_post_meta( $post_id, self::FONTS_META_KEY, $meta );
 
 	}
 

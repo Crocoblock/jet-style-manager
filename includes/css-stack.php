@@ -37,6 +37,7 @@ class CSS_Stack {
 	}
 
 	public function reset_stack( $document ) {
+		do_action( 'jet-styles-manager/css-stack/reset', $document->get_main_id() );
 		delete_post_meta( $document->get_main_id(), '_jet_sm_is_processed' );
 	}
 
