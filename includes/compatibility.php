@@ -186,6 +186,30 @@ class Compatibility {
 				);
 				break;
 
+			case 'jet-box-style':
+				$new_args = array(
+					'background'          => $load_info,
+					'color'               => $load_info,
+					'color_stop'          => $load_info,
+					'color_b'             => $load_info,
+					'color_b_stop'        => $load_info,
+					'gradient_type'       => $load_info,
+					'gradient_angle'      => $load_info,
+					'gradient_position'   => $load_info,
+					'box_font_color'      => $load_info,
+					'box_font_size'       => $load_info,
+					'box_size'            => $load_info,
+					'box_border'          => $load_info,
+					'box_border_width'    => $load_info,
+					'box_border_color'    => $load_info,
+					'box_border_radius'   => $load_info,
+					'allow_box_shadow'    => $load_info,
+					'box_shadow'          => $load_info,
+					'box_shadow_position' => $load_info,
+
+				);
+				break;
+
 		}
 
 		if ( ! empty( $new_args ) ) {

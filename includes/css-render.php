@@ -44,6 +44,7 @@ class CSS_Render {
 
 		$this->enqueue_hidden_fonts( array( 'post_id' => $post_id ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
+
 	}
 
 	/**
@@ -53,6 +54,8 @@ class CSS_Render {
 	 * @return [type]          [description]
 	 */
 	public function enqueue_hidden_fonts( $query, $query_rel = 'AND' ) {
+
+		$query['__select'] = ' `plugin`, `visible_on`, `fonts` ';
 
 		$hidden_rules = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
 

@@ -36,6 +36,13 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	}
 
 	/**
+	 * Set up parent CSS file
+	 */
+	public function set_parent( $file = null ) {
+		$this->parent_file = $file;
+	}
+
+	/**
 	 * Returns fil name
 	 * @return [type] [description]
 	 */
@@ -252,6 +259,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 			$plugin = $control['jet_plugin'];
 
 			$this->stack->add_to_stack(
+				$this->parent_file->get_post_id(),
 				$level,
 				$plugin,
 				array(

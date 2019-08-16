@@ -56,7 +56,7 @@ class CSS_Stack {
 			}
 
 			$this->processed_files[] = $post_id;
-			$is_processed = get_post_meta( $post_id, '_jet_sm_is_processed', true );
+			$is_processed            = get_post_meta( $post_id, '_jet_sm_is_processed', true );
 
 			if ( $is_processed ) {
 				return;
@@ -106,6 +106,8 @@ class CSS_Stack {
 
 		Plugin::instance()->skins->add_skin_to_rendered( $element );
 
+		$css_file->set_parent( $post_css );
+
 		$css_file->add_controls_stack_style_rules(
 			$element,
 			$element->get_style_controls( null, $element->get_parsed_dynamic_settings() ),
@@ -123,21 +125,31 @@ class CSS_Stack {
 	 * @param string  $plugin    [description]
 	 * @param array   $rule_data [description]
 	 */
-	public function add_to_stack( $level = 0, $plugin = null, $rule = array() ) {
+	public function add_to_stack( $post_id = false, $level = 0, $plugin = null, $rule = array() ) {
 
-		if ( empty( $this->stack[ $level ] ) ) {
-			$this->stack[ $level ] = array();
+		if ( ! $post_id ) {
+			$key = 'general';
+		} else {
+			$key = $post_id;
 		}
 
-		if ( empty( $this->stack[ $level ][ $plugin ] ) ) {
-			$this->stack[ $level ][ $plugin ] = array();
+		if ( empty( $this->stack[ $key ] ) ) {
+			$this->stack[ $key ] = array();
+		}
+
+		if ( empty( $this->stack[ $key ][ $level ] ) ) {
+			$this->stack[ $key ][ $level ] = array();
+		}
+
+		if ( empty( $this->stack[ $key ][ $level ][ $plugin ] ) ) {
+			$this->stack[ $key ][ $level ][ $plugin ] = array();
 		}
 
 		if ( false !== strpos( $rule['output_css_property'], 'font-family' ) ) {
-			$this->fonts_stack[ $level ][ $plugin ][] = $this->get_font_from_css_prop( $rule['output_css_property'] );
+			$this->fonts_stack[ $key ][ $level ][ $plugin ][] = $this->get_font_from_css_prop( $rule['output_css_property'] );
 		}
 
-		$this->stack[ $level ][ $plugin ][] = $rule;
+		$this->stack[ $key ][ $level ][ $plugin ][] = $rule;
 
 	}
 
@@ -172,10 +184,18 @@ class CSS_Stack {
 
 		$post_id = $post_css->get_post_id();
 
-		foreach ( $this->stack as $level => $plugins ) {
+		if ( ! $post_id ) {
+			$key = 'general';
+		} else {
+			$key = $post_id;
+		}
+
+		$stack = ! empty( $this->stack[ $key ] ) ? $this->stack[ $key ] : array();
+
+		foreach ( $stack as $level => $plugins ) {
 			foreach ( $plugins as $plugin => $rules ) {
 
-				$current_fonts = ! empty( $this->fonts_stack[ $level ][ $plugin ] ) ? $this->fonts_stack[ $level ][ $plugin ] : array();
+				$current_fonts = ! empty( $this->fonts_stack[ $key ][ $level ][ $plugin ] ) ? $this->fonts_stack[ $key ][ $level ][ $plugin ] : array();
 				$current_fonts = array_filter( $current_fonts );
 				$current_fonts = array_unique( $current_fonts );
 
@@ -210,8 +230,6 @@ class CSS_Stack {
 				);
 			}
 		}
-
-		$this->stack = false;
 
 		if ( $post_id ) {
 			update_post_meta( $post_id, '_jet_sm_is_processed', 1 );
