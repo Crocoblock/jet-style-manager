@@ -21,6 +21,8 @@ class CSS_Stack {
 	private $render          = null;
 	private $processed_files = array();
 
+	private static $hooked = false;
+
 	/**
 	 * Constructor for the class
 	 */
@@ -29,9 +31,6 @@ class CSS_Stack {
 		$this->render = new CSS_Render();
 
 		add_action( 'elementor/element/before_parse_css', array( $this, 'start_new_stack' ) );
-		add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
-		add_action( 'elementor/css-file/post/parse', array( $this, 'process_stack' ) );
-
 		add_action( 'elementor/document/after_save', array( $this, 'reset_stack' ) );
 
 	}
@@ -66,6 +65,13 @@ class CSS_Stack {
 		}
 
 		if ( false === $this->stack ) {
+
+			if ( ! self::$hooked ) {
+				add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
+				add_action( 'elementor/css-file/post/parse', array( $this, 'process_stack' ) );
+				self::$hooked = true;
+			}
+
 			$this->stack = array();
 		}
 	}
@@ -191,30 +197,49 @@ class CSS_Stack {
 			$key = $post_id;
 		}
 
-		$stack = ! empty( $this->stack[ $key ] ) ? $this->stack[ $key ] : array();
+		$stack   = ! empty( $this->stack[ $key ] ) ? $this->stack[ $key ] : array();
+		$cleared = array();
 
 		foreach ( $stack as $level => $plugins ) {
+
 			foreach ( $plugins as $plugin => $rules ) {
 
 				$current_fonts = ! empty( $this->fonts_stack[ $key ][ $level ][ $plugin ] ) ? $this->fonts_stack[ $key ][ $level ][ $plugin ] : array();
 				$current_fonts = array_filter( $current_fonts );
 				$current_fonts = array_unique( $current_fonts );
 
-				$where = array(
-					'visible_on' => $level,
-					'plugin'     => $plugin,
-				);
+				if ( empty( $cleared[ $plugin ] ) ) {
 
-				if ( $post_id ) {
-					$where['post_id'] = $post_id;
+					$where = array(
+						'plugin' => $plugin,
+					);
+
+					if ( $post_id ) {
+						$where['post_id'] = $post_id;
+					}
+
+					if ( $widget ) {
+						$where['widget'] = $widget;
+					}
+
+					if ( $skin ) {
+						$where['skin'] = $skin;
+					}
+
+					Plugin::instance()->db->delete_row( $where );
+
+					$cleared[ $plugin ] = true;
+
 				}
 
-				if ( $widget ) {
-					$where['widget'] = $widget;
-				}
+				$stylesheet = $this->render->get_stylesheet();
 
-				if ( $skin ) {
-					$where['skin'] = $skin;
+				foreach ( $rules as $rule ) {
+					$stylesheet->add_rules(
+						$rule['parsed_selector'],
+						$rule['output_css_property'],
+						$rule['query']
+					);
 				}
 
 				Plugin::instance()->db->update_row(
@@ -224,10 +249,9 @@ class CSS_Stack {
 						'plugin'     => $plugin,
 						'widget'     => $widget,
 						'skin'       => $skin,
-						'styles'     => json_encode( $rules ),
+						'styles'     => $stylesheet->__toString(),
 						'fonts'      => json_encode( $current_fonts ),
-					),
-					$where
+					)
 				);
 			}
 		}

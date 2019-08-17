@@ -20,6 +20,8 @@ class CSS_Render {
 
 	const FONTS_META_KEY = '_jet_sm_fonts_cache';
 
+	private $cache = array();
+
 	/**
 	 * Constructor for the class
 	 */
@@ -30,6 +32,12 @@ class CSS_Render {
 		add_action( 'jet-styles-manager/css-stack/reset', array( $this, 'reset_fonts_cache' ) );
 	}
 
+	/**
+	 * Clear fonts cache on appropriate post update
+	 *
+	 * @param  [type] $post_id [description]
+	 * @return [type]          [description]
+	 */
 	public function reset_fonts_cache( $post_id ) {
 		delete_post_meta( $post_id, self::FONTS_META_KEY );
 	}
@@ -56,6 +64,31 @@ class CSS_Render {
 	}
 
 	/**
+	 * Returns cached fonts
+	 *
+	 * @param  [type] $query     [description]
+	 * @param  [type] $query_rel [description]
+	 * @return [type]            [description]
+	 */
+	public function get_cached( $query, $query_rel ) {
+
+		$hash_query = $query;
+
+		if ( isset( $hash_query['__select'] ) ) {
+			unset( $hash_query['__select'] );
+		}
+
+		$hash = md5( http_build_query( $hash_query ) . $query_rel );
+
+		if ( ! isset( $this->cache[ $hash ] ) ) {
+			$this->cache[ $hash ] = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
+		}
+
+		return $this->cache[ $hash ];
+
+	}
+
+	/**
 	 * Enqueue hidden fonts for given post ID
 	 *
 	 * @param  [type] $post_id [description]
@@ -75,7 +108,7 @@ class CSS_Render {
 
 		$query['__select'] = ' `plugin`, `visible_on`, `fonts` ';
 
-		$hidden_rules = Plugin::instance()->db->query( $query, 0, 0, array(), $query_rel );
+		$hidden_rules = $this->get_cached( $query, $query_rel );
 
 		if ( empty( $hidden_rules ) ) {
 			$this->update_fonts_cache( $post_id, $query, array() );
@@ -172,6 +205,24 @@ class CSS_Render {
 	}
 
 	/**
+	 * Returns new stylesheet instance
+	 * @return [type] [description]
+	 */
+	public function get_stylesheet() {
+
+		$stylesheet_obj = new Stylesheet();
+		$breakpoints    = Responsive::get_breakpoints();
+
+		$stylesheet_obj
+			->add_device( 'mobile', 0 )
+			->add_device( 'tablet', $breakpoints['md'] )
+			->add_device( 'desktop', $breakpoints['lg'] );
+
+		return $stylesheet_obj;
+
+	}
+
+	/**
 	 * Render styles using internal or external stylesheet object
 	 */
 	public function render_styles( $query = array(), $stylesheet_obj = null, $inline = false, $query_rel = 'AND' ) {
@@ -183,13 +234,11 @@ class CSS_Render {
 		}
 
 		if ( ! $stylesheet_obj ) {
-			$stylesheet_obj = new Stylesheet();
-			$breakpoints    = Responsive::get_breakpoints();
+			$stylesheet_obj = $this->get_stylesheet();
+		}
 
-			$stylesheet_obj
-				->add_device( 'mobile', 0 )
-				->add_device( 'tablet', $breakpoints['md'] )
-				->add_device( 'desktop', $breakpoints['lg'] );
+		if ( $inline ) {
+			$result = '';
 		}
 
 		foreach ( $hidden_rules as $set ) {
@@ -199,16 +248,13 @@ class CSS_Render {
 
 			if ( $visible_on > $load_level ) {
 
-				$styles = json_decode( $set['styles'], true );
 
-				if ( ! empty( $styles ) ) {
-					foreach ( $styles as $style ) {
-						$stylesheet_obj->add_rules(
-							$style['parsed_selector'],
-							$style['output_css_property'],
-							$style['query']
-						);
-					}
+				$css = $set['styles'];
+
+				$stylesheet_obj->add_raw_css( $css );
+
+				if ( $inline ) {
+					$result .= $css;
 				}
 
 			}
@@ -216,17 +262,8 @@ class CSS_Render {
 		}
 
 		if ( $inline ) {
-			printf( '<style>%s</style>', $stylesheet_obj->__toString() );
+			printf( '<style>%s</style>', $result );
 		}
-
-	}
-
-	/**
-	 * Render skin related styles
-	 *
-	 * @return [type] [description]
-	 */
-	public function render_skin_styles() {
 
 	}
 

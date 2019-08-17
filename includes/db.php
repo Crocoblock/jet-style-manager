@@ -30,13 +30,6 @@ class DB {
 	public $latest_result = null;
 
 	/**
-	 * Query cache
-	 *
-	 * @var array
-	 */
-	public $cache = array();
-
-	/**
 	 * Constructor for the class
 	 */
 	public function __construct() {
@@ -117,22 +110,13 @@ class DB {
 			);
 		} else {
 
-			$exists = $this->query( $where );
+			$this->delete_row( $where );
 
-			if ( ! empty( $exists ) ) {
-				self::wpdb()->update(
-					self::table(),
-					$item,
-					$where,
-					array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
-				);
-			} else {
-				self::wpdb()->insert(
-					self::table(),
-					$item,
-					array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
-				);
-			}
+			self::wpdb()->insert(
+				self::table(),
+				$item,
+				array( '%d', '%d', '%s', '%s', '%s', '%s', '%s' )
+			);
 
 		}
 
@@ -301,12 +285,6 @@ class DB {
 	 */
 	public function query( $args = array(), $limit = 0, $offset = 0, $order = array(), $rel = 'AND' ) {
 
-		$hash = md5( http_build_query( $args ) );
-
-		if ( isset( $this->cache[ $hash ] ) ) {
-			return $this->cache[ $hash ];
-		}
-
 		$table = self::table();
 
 		if ( empty( $args['__select'] ) ) {
@@ -330,8 +308,6 @@ class DB {
 		}
 
 		$raw = self::wpdb()->get_results( $query, ARRAY_A );
-
-		$this->cache[ $hash ] = $raw;
 
 		return $raw;
 	}
