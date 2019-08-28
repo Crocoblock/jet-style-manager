@@ -73,7 +73,7 @@ class DB {
 			return;
 		}
 
-		$this->create_db_table();
+		self::create_db_table();
 
 	}
 
@@ -129,7 +129,30 @@ class DB {
 	 * @return [type]        [description]
 	 */
 	public function delete_row( $where = array() ) {
-		self::wpdb()->delete( self::table(), $where );
+
+		$table = self::table();
+
+		$where_string = '';
+		$glue         = '';
+
+		foreach ( $where as $key => $value ) {
+
+			$operator = '=';
+
+			if ( 'visible_on' === $key ) {
+				$operator = '<=';
+			}
+
+			if ( ! is_int( $value ) ) {
+				$value = sprintf( '\'%s\'', $value );
+			}
+
+			$where_string .= $glue . '`' . $key . '` ' . $operator . ' ' . $value;
+			$glue = ' AND ';
+		}
+
+		self::wpdb()->query( "DELETE FROM $table WHERE $where_string;" );
+
 	}
 
 	/**
@@ -137,7 +160,7 @@ class DB {
 	 *
 	 * @return void
 	 */
-	public function create_db_table() {
+	public static function create_db_table() {
 
 		if ( ! function_exists( 'dbDelta' ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );

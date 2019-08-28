@@ -68,10 +68,10 @@ class Compatibility {
 	 */
 	public function get_plugin_level( $slug = null ) {
 
-		if ( ! $slug || ! isset( $_plugins[ $slug ] ) ) {
+		if ( ! $slug || ! isset( $this->_plugins[ $slug ] ) ) {
 			return false;
 		} else {
-			return absint( $_plugins[ $slug ] );
+			return absint( $this->_plugins[ $slug ] );
 		}
 
 	}

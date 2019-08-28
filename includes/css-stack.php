@@ -207,11 +207,13 @@ class CSS_Stack {
 				$current_fonts = ! empty( $this->fonts_stack[ $key ][ $level ][ $plugin ] ) ? $this->fonts_stack[ $key ][ $level ][ $plugin ] : array();
 				$current_fonts = array_filter( $current_fonts );
 				$current_fonts = array_unique( $current_fonts );
+				$load_level    = Plugin::instance()->compatibility->get_plugin_level( $plugin );
 
 				if ( empty( $cleared[ $plugin ] ) ) {
 
 					$where = array(
-						'plugin' => $plugin,
+						'plugin'     => $plugin,
+						'visible_on' => $load_level,
 					);
 
 					if ( $post_id ) {
@@ -224,6 +226,7 @@ class CSS_Stack {
 
 					if ( $skin ) {
 						$where['skin'] = $skin;
+						unset( $where['visible_on'] );
 					}
 
 					Plugin::instance()->db->delete_row( $where );
