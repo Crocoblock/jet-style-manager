@@ -10,7 +10,8 @@
 			$( document )
 				.on( 'click', '.jet-sm-popup-close', JetSM.hidePopup )
 				.on( 'click', '#jet-sm-save-skin', JetSM.saveSkin )
-				.on( 'click', '.jet-sm-apply-skin', JetSM.applySkin );
+				.on( 'click', '.jet-sm-apply-skin', JetSM.applySkin )
+				.on( 'click', '.jet-sm-delete-skin', JetSM.deleteSkin );
 
 			window.elementor.hooks.addFilter( 'elements/widget/contextMenuGroups', function( groups, element ) {
 
@@ -143,6 +144,38 @@
 			});
 
 		},
+		deleteSkin: function() {
+
+			if ( ! JetSM.currentElement ) {
+				// TODO: show error
+				return;
+			}
+
+			var $button  = $( this ),
+				skinName = $button.attr( 'data-skin' );
+
+			$.ajax({
+				url: window.ajaxurl,
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					action: 'jet_sm_delete_skin',
+					name: skinName,
+					widget: JetSM.currentElement.model.attributes.widgetType,
+				},
+			}).done( function( response ) {
+				if ( response.success ) {
+					var modal = JetSM.getModal();
+
+					if ( response.success ) {
+						modal.setMessage( JetSM.getModalMessage( response.data.skins ) );
+					}
+				}
+			}).fail( function() {
+				// TODO: show error
+			});
+
+		},
 		applySkin: function() {
 
 			if ( ! JetSM.currentElement ) {
@@ -218,32 +251,36 @@
 					widget: JetSM.currentElement.model.attributes.widgetType,
 				},
 			}).done( function( response ) {
-
-				var modalMessage = null;
-
-				modalMessage = '<div class="jet-sm-skins">';
-
-				if ( response.data.skins.length ) {
-					modalMessage += '<table class="jet-sm-skins__table"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>';
-
-					response.data.skins.forEach( function( skin ) {
-						modalMessage += '<tr><td>' + skin.skin + '</td><td><button type="button" class="elementor-button elementor-button-success jet-sm-apply-skin" data-skin="' + skin.skin + '">Apply</button><a href="#" class="jet-sm-delete-skin" data-skin="' + skin.skin + '">Delete</a></td></tr>';
-					});
-
-					modalMessage += '</tbody></table>';
-				} else {
-					modalMessage += '<div class="jet-sm-skins__not-found">No skins found for this widget</div>';
+				if ( response.success ) {
+					modal.setMessage( JetSM.getModalMessage( response.data.skins ) );
 				}
-
-				modalMessage += '</div>';
-
-				modal.setMessage( modalMessage );
 				modal.refreshPosition();
-
 			}).fail( function() {
 				// TODO: show error
 			});
 
+		},
+		getModalMessage: function( skins ) {
+
+			var modalMessage = null;
+
+			modalMessage = '<div class="jet-sm-skins">';
+
+			if ( skins.length ) {
+				modalMessage += '<table class="jet-sm-skins__table"><thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody>';
+
+				skins.forEach( function( skin ) {
+					modalMessage += '<tr><td>' + skin.skin + '</td><td><button type="button" class="elementor-button elementor-button-success jet-sm-apply-skin" data-skin="' + skin.skin + '">Apply</button><a href="#" class="jet-sm-delete-skin" data-skin="' + skin.skin + '">Delete</a></td></tr>';
+				});
+
+				modalMessage += '</tbody></table>';
+			} else {
+				modalMessage += '<div class="jet-sm-skins__not-found">No skins found for this widget</div>';
+			}
+
+			modalMessage += '</div>';
+
+			return modalMessage;
 		},
 	};
 

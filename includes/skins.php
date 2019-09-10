@@ -131,6 +131,7 @@ class Skins {
 	public function editor() {
 		add_action( 'elementor/editor/before_enqueue_scripts', array( $this, 'editor_assets' ) );
 		add_action( 'wp_ajax_jet_sm_save_skin', array( $this, 'save_skin' ) );
+		add_action( 'wp_ajax_jet_sm_delete_skin', array( $this, 'delete_skin' ) );
 		add_action( 'wp_ajax_jet_sm_get_skins_for_widget', array( $this, 'get_skins_for_widget' ) );
 		add_action( 'wp_ajax_jet_sm_apply_skin', array( $this, 'apply_skin' ) );
 		add_action( 'wp_ajax_jet_sm_load_skins_css', array( $this, 'load_preview_skin_css' ) );
@@ -193,7 +194,7 @@ class Skins {
 		$render->enqueue_hidden_fonts( array( 'widget' => $widget, 'skin' => $skin ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
 		$css = ob_get_clean();
-		$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
+		$css = str_replace( '.elementor .elementor-inner', 'body #elementor.elementor .elementor-inner', $css );
 
 		wp_send_json_success( array(
 			'class_name' => $this->get_skin_class_name( $skin, $widget ),
@@ -229,6 +230,29 @@ class Skins {
 		) );
 
 		wp_send_json_success( array( 'skins' => $skins ) );
+
+	}
+
+	/**
+	 * Delete skin
+	 *
+	 * @return [type] [description]
+	 */
+	public function delete_skin() {
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'You don\'t have permissions to deleting skins' ) );
+		}
+
+		$widget = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
+		$skin   = $_REQUEST['name'] ? esc_attr( $_REQUEST['name'] ) : false;
+
+		Plugin::instance()->db->delete_row( array(
+			'widget' => $widget,
+			'skin'   => $skin,
+		) );
+
+		$this->get_skins_for_widget();
 
 	}
 
