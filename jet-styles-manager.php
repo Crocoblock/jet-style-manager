@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: JetStylesManager
- * Plugin URI:
+ * Plugin URI:  https://crocoblock.com
  * Description: Styles manager
  * Version:     1.0.0
  * Author:      Crocoblock
- * Author URI:
+ * Author URI:  https://crocoblock.com
  * Text Domain: jet-styles-manager
  * License:     GPL-3.0+
  * License URI: http://www.gnu.org/licenses/gpl-3.0.txt
