@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: JetStylesManager
+ * Plugin Name: JetStyleManager
  * Plugin URI:  https://crocoblock.com
- * Description: Styles manager
+ * Description: Style manager for Crocoblock plugins
  * Version:     1.0.0
  * Author:      Crocoblock
  * Author URI:  https://crocoblock.com
