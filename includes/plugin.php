@@ -66,10 +66,10 @@ class Plugin {
 	 * @return void
 	 */
 	public function init_components() {
-		$this->db            = new DB();
-		$this->css_stack     = new CSS_Stack();
-		$this->compatibility = new Compatibility();
-		$this->skins         = new Skins();
+		$this->db               = new DB();
+		$this->css_stack        = new Elementor\CSS_Stack();
+		$this->compatibility    = new Compatibility();
+		$this->skins            = new Elementor\Skins();
 	}
 
 	/**

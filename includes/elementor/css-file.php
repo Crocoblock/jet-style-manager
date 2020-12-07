@@ -1,6 +1,7 @@
 <?php
-namespace JET_SM;
+namespace JET_SM\Elementor;
 
+use JET_SM\Plugin;
 use \Elementor\Controls_Stack;
 use \Elementor\Element_Base;
 use \Elementor\Core\DynamicTags\Manager;

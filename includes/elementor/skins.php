@@ -1,5 +1,7 @@
 <?php
-namespace JET_SM;
+namespace JET_SM\Elementor;
+
+use JET_SM\Plugin;
 
 /**
  * Skins manager class
@@ -194,6 +196,7 @@ class Skins {
 		$render->enqueue_hidden_fonts( array( 'widget' => $widget, 'skin' => $skin ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
 		$css = ob_get_clean();
+
 		$css = str_replace( '.elementor .elementor-inner', 'body #elementor.elementor .elementor-inner', $css );
 
 		wp_send_json_success( array(

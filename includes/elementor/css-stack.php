@@ -1,5 +1,7 @@
 <?php
-namespace JET_SM;
+namespace JET_SM\Elementor;
+
+use JET_SM\Plugin;
 
 /**
  * Database manager class
@@ -27,7 +29,6 @@ class CSS_Stack {
 	 * Constructor for the class
 	 */
 	public function __construct() {
-
 		$this->render = new CSS_Render();
 
 		add_action( 'elementor/element/before_parse_css', array( $this, 'start_new_stack' ) );
@@ -74,6 +75,7 @@ class CSS_Stack {
 
 			$this->stack = array();
 		}
+
 	}
 
 	/**

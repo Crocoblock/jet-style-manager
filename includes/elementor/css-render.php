@@ -1,6 +1,7 @@
 <?php
-namespace JET_SM;
+namespace JET_SM\Elementor;
 
+use JET_SM\Plugin;
 use \Elementor\Stylesheet;
 use \Elementor\Core\Responsive\Responsive;
 
@@ -246,9 +247,8 @@ class CSS_Render {
 			$load_level = Plugin::instance()->compatibility->get_plugin_level( $set['plugin'] );
 			$visible_on = absint( $set['visible_on'] );
 
+		// Need to fix load level, stopped working in Elementor 2.9.0+
 			if ( $visible_on > $load_level ) {
-
-
 				$css = $set['styles'];
 
 				$stylesheet_obj->add_raw_css( $css );
@@ -256,10 +256,9 @@ class CSS_Render {
 				if ( $inline ) {
 					$result .= $css;
 				}
-
 			}
-
 		}
+		exit();
 
 		if ( $inline ) {
 			printf( '<style>%s</style>', $result );
