@@ -149,12 +149,14 @@ class BaseControl{
 			updValueObject,
 			optionName = ! this.args.breakpoints || ! this.curent_breakpoints || 'desktop' === this.curent_breakpoints ? 'value' : this.curent_breakpoints ;
 
-
 		if( 'object' === typeof value ){
 			value = Object.assign( {}, valueObject[ optionName ], value );
 		}
+
 		value          = this.beforeSetValue( value, id );
 		updValueObject = Object.assign( {}, valueObject, { [ optionName ]: value } );
+
+//console.log(updValueObject);
 
 		if( this.args.css_selector ){
 			this.setMetaValue( updValueObject, blockID, this.args );
@@ -205,19 +207,21 @@ class BaseControl{
 
 		for ( let key in units ) {
 			let args = units[ key ],
-				buttonType = ( args.value === valueCuretn[id] ) ? true : false;
+				disabled = units.length === 1 ? true : false ,
+				buttonType = ( args.value === valueCuretn[id] && ! disabled ) ? true : false,
+				lable = args.label ? args.label : args.value;
 
 			untisOptions.push( <Button
 					isPrimary = { buttonType }
 					isSecondary = { ! buttonType }
+					disabled = { disabled }
 					isSmall
 					key={ key }
 					onClick={ ( e ) => {
 						valuesStack[id] = args.value;
 						this.setValue( valuesStack );
-
 					} }
-				>{ args.label }</Button> );
+				>{ lable.toUpperCase() }</Button> );
 		}
 
 		return <ButtonGroup className={ 'jet-st-control-units' }>{ untisOptions }</ButtonGroup>;

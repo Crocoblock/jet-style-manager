@@ -234,8 +234,11 @@ var BaseControl = function () {
 			if ('object' === (typeof value === 'undefined' ? 'undefined' : _typeof(value))) {
 				value = Object.assign({}, valueObject[optionName], value);
 			}
+
 			value = this.beforeSetValue(value, id);
 			updValueObject = Object.assign({}, valueObject, _defineProperty({}, optionName, value));
+
+			//console.log(updValueObject);
 
 			if (this.args.css_selector) {
 				this.setMetaValue(updValueObject, blockID, this.args);
@@ -311,13 +314,16 @@ var BaseControl = function () {
 
 			var _loop = function _loop(key) {
 				var args = units[key],
-				    buttonType = args.value === valueCuretn[id] ? true : false;
+				    disabled = units.length === 1 ? true : false,
+				    buttonType = args.value === valueCuretn[id] && !disabled ? true : false,
+				    lable = args.label ? args.label : args.value;
 
 				untisOptions.push(wp.element.createElement(
 					Button,
 					{
 						isPrimary: buttonType,
 						isSecondary: !buttonType,
+						disabled: disabled,
 						isSmall: true,
 						key: key,
 						onClick: function onClick(e) {
@@ -325,7 +331,7 @@ var BaseControl = function () {
 							_this.setValue(valuesStack);
 						}
 					},
-					args.label
+					lable.toUpperCase()
 				));
 			};
 
@@ -1366,6 +1372,8 @@ var ColorPicker = function (_BaseControl) {
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Range; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_control__ = __webpack_require__(0);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1417,16 +1425,32 @@ var Range = function (_BaseControl) {
 				show_tooltip: false,
 				with_input_field: true,
 				separator_type: 'none', // none | fullWidth | topFullWidth
-				type: 'number'
+				type: 'number',
+				units: [{ value: 'px', label: 'PX', intervals: { step: 1, min: 0, max: 200, initialPosition: 14 } }]
 			};
 		}
 	}, {
 		key: 'setDefaultAttribut',
 		value: function setDefaultAttribut() {
 			this.attributes = {
-				default: { value: 0 },
+				default: { value: {
+						value: 0,
+						unit: 'px'
+					} },
 				type: 'object'
 			};
+		}
+	}, {
+		key: 'beforeGetValue',
+		value: function beforeGetValue(value, id) {
+			if ('number' === typeof value) {
+				value = {
+					value: value,
+					unit: 'px'
+				};
+			}
+
+			return value;
 		}
 	}, {
 		key: 'renderControl',
@@ -1450,32 +1474,38 @@ var Range = function (_BaseControl) {
 			    render_tooltip_content = _args.render_tooltip_content,
 			    show_tooltip = _args.show_tooltip,
 			    with_input_field = _args.with_input_field,
-			    separator_type = _args.separator_type;
+			    separator_type = _args.separator_type,
+			    units = _args.units;
 
 
-			return wp.element.createElement(RangeControl, {
-				value: this.getValue(),
-				onChange: function onChange(newValue) {
-					return _this2.setValue(newValue);
-				},
-				marks: marks,
-				min: min,
-				max: max,
-				step: step,
-				beforeIcon: beforeIcon,
-				afterIcon: afterIcon,
-				icon: icon,
-				disabled: disabled,
-				initialPosition: initial_position,
-				isShiftStepEnabled: is_shift_step_enabled,
-				allowReset: allow_reset,
-				railColor: rail_color,
-				trackColor: track_color,
-				renderTooltipContent: render_tooltip_content,
-				showTooltip: show_tooltip,
-				withInputField: with_input_field,
-				separatorType: separator_type
-			});
+			var valueObject = Object.assign({}, this.attributes.default.value, this.getValue());
+
+			return wp.element.createElement(
+				'div',
+				{ className: 'jet-st-range-wrapper' },
+				wp.element.createElement(RangeControl, _extends({
+					value: valueObject.value,
+					onChange: function onChange(newValue) {
+						valueObject.value = newValue;
+						_this2.setValue(valueObject);
+					},
+					marks: marks,
+					beforeIcon: beforeIcon,
+					afterIcon: afterIcon,
+					icon: icon,
+					disabled: disabled,
+					initialPosition: initial_position,
+					isShiftStepEnabled: is_shift_step_enabled,
+					allowReset: allow_reset,
+					railColor: rail_color,
+					trackColor: track_color,
+					renderTooltipContent: render_tooltip_content,
+					showTooltip: show_tooltip,
+					withInputField: with_input_field,
+					separatorType: separator_type
+				}, this.getIntervals(units, valueObject.unit))),
+				this.renderUnitsControl(units, 'unit', valueObject, valueObject)
+			);
 		}
 	}]);
 

@@ -39,14 +39,31 @@ class Range extends BaseControl {
 			with_input_field: true,
 			separator_type: 'none', // none | fullWidth | topFullWidth
 			type: 'number',
+			units: [
+				{ value: 'px', label: 'PX', intervals: { step: 1, min: 0, max:200, initialPosition: 14 } },
+			],
 		};
 	}
 
 	setDefaultAttribut(){
 		this.attributes = {
-			default: { value: 0 },
+			default: { value: {
+				value:0,
+				unit: 'px'
+			} },
 			type: 'object',
 		}
+	}
+
+	beforeGetValue( value, id ){
+		if( 'number'=== typeof value ){
+			value = {
+				value: value,
+				unit: 'px'
+			}
+		}
+
+		return value;
 	}
 
 	renderControl(){
@@ -67,30 +84,39 @@ class Range extends BaseControl {
 			render_tooltip_content,
 			show_tooltip,
 			with_input_field,
-			separator_type
+			separator_type,
+			units
 		} = this.args;
 
-		return <RangeControl
-			value={ this.getValue() }
-			onChange={ ( newValue ) => this.setValue( newValue ) }
-			marks={ marks }
-			min={ min }
-			max={ max }
-			step={ step }
-			beforeIcon={ beforeIcon }
-			afterIcon={ afterIcon }
-			icon={ icon }
-			disabled={ disabled }
-			initialPosition={ initial_position }
-			isShiftStepEnabled={ is_shift_step_enabled }
-			allowReset={ allow_reset }
-			railColor={ rail_color }
-			trackColor={ track_color }
-			renderTooltipContent={ render_tooltip_content }
-			showTooltip={ show_tooltip }
-			withInputField={ with_input_field }
-			separatorType={ separator_type }
-		/>
+		let valueObject = Object.assign( {}, this.attributes.default.value, this.getValue() );
+
+		return (
+			<div className={ 'jet-st-range-wrapper' }>
+				<RangeControl
+					value={ valueObject.value }
+					onChange = { ( newValue ) => {
+						valueObject.value = newValue;
+						this.setValue( valueObject );
+					} }
+					marks={ marks }
+					beforeIcon={ beforeIcon }
+					afterIcon={ afterIcon }
+					icon={ icon }
+					disabled={ disabled }
+					initialPosition={ initial_position }
+					isShiftStepEnabled={ is_shift_step_enabled }
+					allowReset={ allow_reset }
+					railColor={ rail_color }
+					trackColor={ track_color }
+					renderTooltipContent={ render_tooltip_content }
+					showTooltip={ show_tooltip }
+					withInputField={ with_input_field }
+					separatorType={ separator_type }
+					{ ...this.getIntervals( units, valueObject.unit ) }
+				/>
+				{ this.renderUnitsControl( units, 'unit', valueObject, valueObject ) }
+			</div>
+		);
 	}
 }
 

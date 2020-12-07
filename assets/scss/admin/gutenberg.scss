@@ -1,7 +1,7 @@
 #editor {
 	.components-button-group{
 		&.jet-st-control-units{
-			margin: 5px 0 15px 0;
+			margin: 4px 0 15px;
 			align-self: flex-end;
 		}
 	}
@@ -13,7 +13,7 @@
 		}
 	}
 
-// Jet Control Wrapper
+//Control Wrapper
 	.jet-sm-gb-control-wrapper{
 		.components-base-control{
 			.components-base-control__field{
@@ -59,7 +59,7 @@
 		}
 	}
 
-// Jet Section
+//Section
 	.jet-st-section{
 		border-bottom: none;
 		&.jet-sm-gb-control-wrapper{
@@ -74,7 +74,7 @@
 		}
 	}
 
-// Jet Tabs
+//Tabs
 	.jet-st-tabs{
 		.components-tab-panel__tabs-item{
 			padding: 4px 9px;
@@ -98,7 +98,7 @@
 		}
 	}
 
-// Jet Choose Control
+//Choose
 	.jet-st-choose-control{
 		.components-base-control__field{
 			.components-base-control__label{
@@ -139,7 +139,7 @@
 		}
 	}
 
-//Jet Typography
+//Typography
 	.jet-sm-gb-control-wrapper.jet-st-typography-control{
 		.components-select-control{
 			.components-input-control__container{
@@ -152,11 +152,24 @@
 		}
 	}
 
-//Jet Border
+//Border
 	.jet-st-border-control{
 		.jet-st-border-options{
 			&>div{
 				margin-top: 15px;
+			}
+		}
+	}
+
+//Range
+	.jet-st-range-control{
+		.jet-st-range-wrapper{
+			display: flex;
+			flex-direction: column;
+			.components-range-control__wrapper{
+				height: initial;
+				min-height: initial;
+				margin-bottom: initial;
 			}
 		}
 	}
