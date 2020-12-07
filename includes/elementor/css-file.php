@@ -165,7 +165,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 	 * @param array    $placeholders   Placeholders.
 	 * @param array    $replacements   Replacements.
 	 */
-	public function add_control_rules( array $control, array $controls_stack, callable $value_callback, array $placeholders, array $replacements ) {
+	public function add_control_rules( array $control, array $controls_stack, callable $value_callback, array $placeholders, array $replacements, array $values = [] ) {
 
 		$value = call_user_func( $value_callback, $control );
 
