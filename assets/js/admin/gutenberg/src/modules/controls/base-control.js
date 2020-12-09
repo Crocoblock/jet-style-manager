@@ -89,7 +89,7 @@ class BaseControl{
 		id = id || this.args.id;
 		valueObject = ! this.args.css_selector ? this.getAtributValue( id, blockID ) : this.getMetaValue( id, blockID ) ;
 
-		if( undefined === valueObject || ! valueObject.value ){
+		if( undefined === valueObject || undefined === valueObject.value ){
 			valueObject = this.attributes.default;
 		}
 
@@ -155,8 +155,6 @@ class BaseControl{
 
 		value          = this.beforeSetValue( value, id );
 		updValueObject = Object.assign( {}, valueObject, { [ optionName ]: value } );
-
-//console.log(updValueObject);
 
 		if( this.args.css_selector ){
 			this.setMetaValue( updValueObject, blockID, this.args );

@@ -162,7 +162,7 @@ function JetStyleManagerMeta(){
 			breakpoints
 		} = controlObject;
 
-		if( ! value  ){
+		if( undefined === value  ){
 			return false;
 		}
 
@@ -171,7 +171,7 @@ function JetStyleManagerMeta(){
 		for ( let item in value ) {
 			let breakpointValue = value[ item ];
 
-			if( ! breakpointValue ){
+			if( undefined === breakpointValue ){
 				return false;
 			}
 
@@ -213,6 +213,7 @@ function JetStyleManagerMeta(){
 			break;
 
 			default:
+
 				value = controlObject.return_value ? controlObject.return_value[ value ] : value ;
 
 				cssOptions = cssOptions.replace( /{{VALUE}}/gmi, value );

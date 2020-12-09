@@ -32,9 +32,15 @@ class Toggle extends BaseControl {
 	}
 
 	renderControl(){
+		let value = this.getValue();
+
 		return <ToggleControl
-			checked={ this.getValue() }
-			onChange={ ( newValue ) => this.setValue( newValue ) }
+			checked={ value }
+			onChange={
+				( newValue ) => {
+					this.setValue( newValue );
+				}
+			}
 		/>;
 	}
 }

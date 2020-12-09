@@ -48,7 +48,7 @@ class Border extends BaseControl {
 			],
 			colors: settings.colors,
 			disable_custom_colors: false,
-			clearable: false,
+			clearable: true,
 			disable_style:false,
 			disable_radius:false,
 			disable_width:false,
