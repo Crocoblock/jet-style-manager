@@ -18,6 +18,7 @@ function JetStyleManagerMeta(){
 
 	if ( Object.keys( blockStyle )[0] ) {
 		renderStyle( blockStyle );
+		select( 'core/editor' ).isEditedPostAutosaveable = () => false;
 	}
 
 	document.addEventListener( 'jet-sm-update-meta', debounce( setMeta, 50 ) );

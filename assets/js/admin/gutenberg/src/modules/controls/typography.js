@@ -193,7 +193,7 @@ class Typography extends BaseControl {
 				}
 
 				{ ! disable_family &&
-					<div>
+					<div className={ 'jet-st-typography-control-select' }>
 						<SelectControl
 							value = { value.family }
 							onChange = { ( newValue ) => {
@@ -207,7 +207,7 @@ class Typography extends BaseControl {
 					</div>
 				}
 				{ ! disable_weight &&
-					<div>
+					<div className={ 'jet-st-typography-control-select' }>
 						<SelectControl
 							value = { value.weight }
 							onChange = { ( newValue ) => {
@@ -221,7 +221,7 @@ class Typography extends BaseControl {
 					</div>
 				}
 				{ ! disable_transform &&
-					<div>
+					<div className={ 'jet-st-typography-control-select' }>
 						<SelectControl
 							value = { value.transform }
 							onChange = { ( newValue ) => {
@@ -235,7 +235,7 @@ class Typography extends BaseControl {
 					</div>
 				}
 				{ ! disable_style &&
-					<div>
+					<div className={ 'jet-st-typography-control-select' }>
 						<SelectControl
 							value = { value.style }
 							onChange = { ( newValue ) => {
@@ -249,7 +249,7 @@ class Typography extends BaseControl {
 					</div>
 				}
 				{ ! disable_decoration &&
-					<div>
+					<div className={ 'jet-st-typography-control-select' }>
 						<SelectControl
 							value = { value.decoration }
 							onChange = { ( newValue ) => {
