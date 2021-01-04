@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.1.1
+* FIX: Elementor compatibility
+
 ## 1.1.0
 * ADD: Gutenberg compatibility
 * ADD: Languages default file
