@@ -247,7 +247,7 @@ class CSS_Render {
 			$load_level = Plugin::instance()->compatibility->get_plugin_level( $set['plugin'] );
 			$visible_on = absint( $set['visible_on'] );
 
-		// Need to fix load level, stopped working in Elementor 2.9.0+
+		//Need to fix load level, stopped working in Elementor 2.9.0+
 			if ( $visible_on > $load_level ) {
 				$css = $set['styles'];
 
@@ -258,7 +258,6 @@ class CSS_Render {
 				}
 			}
 		}
-		exit();
 
 		if ( $inline ) {
 			printf( '<style>%s</style>', $result );
