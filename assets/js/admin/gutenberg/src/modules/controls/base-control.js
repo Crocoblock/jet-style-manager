@@ -80,13 +80,13 @@ class BaseControl{
 		return value;
 	}
 
-	getValue( id = undefined ){
+	getValue(){
 		let blockID = this.blockProps.attributes.blockID,
+			id = this.args.id,
 			optionName = ! this.args.breakpoints || ! this.curent_breakpoints || 'desktop' === this.curent_breakpoints ? 'value' : this.curent_breakpoints,
 			valueObject,
 			value;
 
-		id = id || this.args.id;
 		valueObject = ! this.args.css_selector ? this.getAtributValue( id, blockID ) : this.getMetaValue( id, blockID ) ;
 
 		if( undefined === valueObject || undefined === valueObject.value ){
@@ -293,15 +293,22 @@ class BaseControl{
 	}
 
 	conditionRules( condition ){
-		let conditionState = true;
+		let conditionState = true,
+			blockID        = this.blockProps.attributes.blockID;
 
 		if( 'object' !== typeof condition || ! Object.keys( condition )[0] ){
 			return conditionState;
 		}
 
 		for ( let option in condition ) {
-			let value = this.getValue(option) || this.blockProps.attributes[ option ],
-				conditionValue = condition[ option ];
+			let value = this.getMetaValue( option, blockID ) || this.getAtributValue( option, blockID ),
+				conditionValue = condition[ option ],
+				optionName;
+
+			if( 'object' === typeof( value ) && undefined !== value.value ){
+				optionName = ! this.args.breakpoints || ! this.curent_breakpoints || 'desktop' === this.curent_breakpoints ? 'value' : this.curent_breakpoints;
+				value      = value[ optionName ];
+			}
 
 			switch ( typeof conditionValue ) {
 				case "object":

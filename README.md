@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.1.2
+* FIX: Condition logic in gutenberg style manager
+
 ## 1.1.1
 * FIX: Elementor compatibility
 
