@@ -100,16 +100,16 @@ class Typography extends BaseControl {
 		this.attributes = {
 			default: {
 				value: {
-					family:'inherit',
+					family: 'inherit',
 					size: 14,
 					s_unit: 'px',
-					weight:'400',
-					transform:'inherit',
-					style:'inherit',
-					decoration:'inherit',
-					lineHeight:1.2,
+					weight: '400',
+					transform: 'inherit',
+					style: 'inherit',
+					decoration: 'inherit',
+					line_height: 1.2,
 					lh_unit: '',
-					letterSpacing:1,
+					letter_spacing: 0,
 					ls_unit: 'px',
 				}
 			},
@@ -166,9 +166,9 @@ class Typography extends BaseControl {
 						<RangeControl
 							beforeIcon={ 'image-flip-vertical' }
 							label = { __( 'Line Height', 'jet-styles-manager' ) }
-							value = { value.lineHeight }
+							value = { value.line_height }
 							onChange = { ( newValue ) => {
-								controlValue.lineHeight = newValue;
+								controlValue.line_height = newValue;
 								this.setValue( controlValue );
 							} }
 							{ ...this.getIntervals( lh_units, controlValue.lh_unit ) }
@@ -181,9 +181,9 @@ class Typography extends BaseControl {
 						<RangeControl
 							beforeIcon={ 'image-flip-horizontal' }
 							label = { __( 'Letter Spacing', 'jet-styles-manager' ) }
-							value = { value.letterSpacing }
+							value = { value.letter_spacing }
 							onChange = { ( newValue ) => {
-								controlValue.letterSpacing = newValue;
+								controlValue.letter_spacing = newValue;
 								this.setValue( controlValue );
 							} }
 							{ ...this.getIntervals( ls_units, controlValue.ls_unit ) }

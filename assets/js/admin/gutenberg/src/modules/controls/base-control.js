@@ -87,11 +87,11 @@ class BaseControl{
 			valueObject,
 			value;
 
-		valueObject = ! this.args.css_selector ? this.getAtributValue( id, blockID ) : this.getMetaValue( id, blockID ) ;
+		valueObject = ! this.args.css_selector ? this.getAtributValue( id, blockID ) : this.getMetaValue( id, blockID ) || this.getAtributValue( id, blockID );
 
-		if( undefined === valueObject || undefined === valueObject.value ){
+		/*if( undefined === valueObject || undefined === valueObject.value ){
 			valueObject = this.attributes.default;
-		}
+		}*/
 
 		if( valueObject ){
 			value = valueObject[ optionName ];

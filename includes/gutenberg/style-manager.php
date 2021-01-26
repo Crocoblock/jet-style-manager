@@ -16,7 +16,7 @@ class Style_Manager {
 	const SCRIPT_SLUG = 'jet-sm-gb';
 
 	public function __construct() {
-		add_action( 'init', [ $this, 'register_meta' ], 50 );
+		add_action( 'init', [ $this, 'register_meta' ], 5000 );
 		add_action( 'wp_print_footer_scripts', [ $this, 'render_block_style' ] );
 		add_action( 'admin_print_footer_scripts', [ $this, 'render_editor_block_style' ] );
 
