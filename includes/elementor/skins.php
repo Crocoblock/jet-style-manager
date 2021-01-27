@@ -187,8 +187,8 @@ class Skins {
 			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
 		}
 
-		$widget = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
-		$skin   = $_REQUEST['name'] ? esc_attr( $_REQUEST['name'] ) : false;
+		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
+		$skin   = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
 		$render = new CSS_Render();
 
 		ob_start();
@@ -221,7 +221,7 @@ class Skins {
 			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
 		}
 
-		$widget = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
+		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 
 		if ( ! $widget ) {
 			wp_send_json_error( array( 'message' => 'Widget type not found in request' ) );
@@ -247,8 +247,8 @@ class Skins {
 			wp_send_json_error( array( 'message' => 'You don\'t have permissions to deleting skins' ) );
 		}
 
-		$widget = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
-		$skin   = $_REQUEST['name'] ? esc_attr( $_REQUEST['name'] ) : false;
+		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
+		$skin   = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
 
 		Plugin::instance()->db->delete_row( array(
 			'widget' => $widget,
@@ -270,8 +270,8 @@ class Skins {
 			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
 		}
 
-		$widget   = $_REQUEST['widget'] ? esc_attr( $_REQUEST['widget'] ) : false;
-		$name     = $_REQUEST['name'] ? esc_attr( $_REQUEST['name'] ) : false;
+		$widget   = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
+		$name     = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
 		$settings = $_REQUEST['values'] ? json_decode( wp_unslash( $_REQUEST['values'] ), true ) : array();
 
 		$element_type = \Elementor\Plugin::$instance->widgets_manager->get_widget_types( $widget );
