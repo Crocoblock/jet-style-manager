@@ -149,7 +149,7 @@ class Skins {
 			wp_send_json_error( array( 'message' => 'You don\'t have permissions to do this' ) );
 		}
 
-		$skins = $_REQUEST['skins'] ? json_decode( wp_unslash( $_REQUEST['skins'] ), true ) : array();
+		$skins = $_REQUEST['skins'] ? $this->sanitize( json_decode( wp_unslash( $_REQUEST['skins'] ), true ) ) : array();
 		$skins = array_map( function( $item ) {
 
 			$whitelisted_item = array(
@@ -272,7 +272,7 @@ class Skins {
 
 		$widget   = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 		$name     = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
-		$settings = $_REQUEST['values'] ? json_decode( wp_unslash( $_REQUEST['values'] ), true ) : array();
+		$settings = $_REQUEST['values'] ? $this->sanitize( json_decode( wp_unslash( $_REQUEST['values'] ), true ) ) : array();
 
 		$element_type = \Elementor\Plugin::$instance->widgets_manager->get_widget_types( $widget );
 
@@ -306,6 +306,38 @@ class Skins {
 		}
 
 		wp_send_json_success();
+	}
+
+	public function sanitize( $source = null ) {
+		if ( ! is_array( $source ) ) {
+			return esc_attr( $source );
+		}
+
+		$result = array();
+
+		foreach ( $source as $key => $value ) {
+
+			switch ( gettype( $value ) ) {
+				case 'array':
+				case 'object':
+					if( ! empty( $value ) ){
+						$value = $this->sanitize( $value );
+					}
+				break;
+
+				case 'string':
+					$value = sanitize_text_field( $value );
+				break;
+
+				default:
+					$value = esc_attr( $value );
+				break;
+			}
+
+			$result[ $key ] = $value;
+		}
+
+		return $result;
 	}
 
 	/**
