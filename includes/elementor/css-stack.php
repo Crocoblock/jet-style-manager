@@ -36,6 +36,17 @@ class CSS_Stack {
 
 	}
 
+	/**
+	 * Get CSS file name.
+	 *
+	 * Retrieve CSS file name for the settings base css manager.
+	 *
+	 * @return string CSS file name
+	 */
+	public function get_css_file_name(){
+		return 'post';
+	}
+
 	public function reset_stack( $document ) {
 		do_action( 'jet-styles-manager/css-stack/reset', $document->get_main_id() );
 		delete_post_meta( $document->get_main_id(), '_jet_sm_is_processed' );
@@ -68,8 +79,10 @@ class CSS_Stack {
 		if ( false === $this->stack ) {
 
 			if ( ! self::$hooked ) {
-				add_action( 'elementor/element/parse_css', array( $this, 'process_element' ), 10, 2 );
-				add_action( 'elementor/css-file/post/parse', array( $this, 'process_stack' ) );
+				$name = $this->get_css_file_name();
+
+				add_action( 'elementor/element/parse_css', [ $this, 'process_element' ], 10, 2 );
+				add_action( "elementor/css-file/{$name}/parse", [ $this, 'process_stack' ] );
 				self::$hooked = true;
 			}
 
@@ -88,6 +101,7 @@ class CSS_Stack {
 		if ( ! $this->css_file ) {
 			$this->css_file = new CSS_File( $this, $post_css );
 		}
+
 		return $this->css_file;
 	}
 

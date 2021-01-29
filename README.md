@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.1.4
+* FIX: Typography control
+
 ## 1.1.3
 * FIX: Up init action priority in gutenberg style manager
 

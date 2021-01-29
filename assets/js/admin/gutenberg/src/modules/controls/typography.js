@@ -107,9 +107,9 @@ class Typography extends BaseControl {
 					transform: 'inherit',
 					style: 'inherit',
 					decoration: 'inherit',
-					line_height: 1.2,
+					lineHeight: 1.2,
 					lh_unit: '',
-					letter_spacing: 0,
+					letterSpacing: 0,
 					ls_unit: 'px',
 				}
 			},
@@ -166,9 +166,9 @@ class Typography extends BaseControl {
 						<RangeControl
 							beforeIcon={ 'image-flip-vertical' }
 							label = { __( 'Line Height', 'jet-styles-manager' ) }
-							value = { value.line_height }
+							value = { value.lineHeight }
 							onChange = { ( newValue ) => {
-								controlValue.line_height = newValue;
+								controlValue.lineHeight = newValue;
 								this.setValue( controlValue );
 							} }
 							{ ...this.getIntervals( lh_units, controlValue.lh_unit ) }
@@ -181,9 +181,9 @@ class Typography extends BaseControl {
 						<RangeControl
 							beforeIcon={ 'image-flip-horizontal' }
 							label = { __( 'Letter Spacing', 'jet-styles-manager' ) }
-							value = { value.letter_spacing }
+							value = { value.letterSpacing }
 							onChange = { ( newValue ) => {
-								controlValue.letter_spacing = newValue;
+								controlValue.letterSpacing = newValue;
 								this.setValue( controlValue );
 							} }
 							{ ...this.getIntervals( ls_units, controlValue.ls_unit ) }
