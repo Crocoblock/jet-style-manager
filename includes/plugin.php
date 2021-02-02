@@ -30,6 +30,17 @@ class Plugin {
 	public $skins;
 
 	/**
+	 * Plugin constructor.
+	 */
+	private function __construct() {
+
+		$this->register_autoloader();
+		$this->load_files();
+
+		add_action( 'init', array( $this, 'init_components' ), 20 );
+	}
+
+	/**
 	 * Instance.
 	 *
 	 * Ensures only one instance of the plugin class is loaded or can be loaded.
@@ -66,20 +77,19 @@ class Plugin {
 	 * @return void
 	 */
 	public function init_components() {
-		$this->db               = new DB();
-		$this->css_stack        = new Elementor\CSS_Stack();
-		$this->compatibility    = new Compatibility();
-		$this->skins            = new Elementor\Skins();
+		$this->db            = new DB();
+		$this->css_stack     = new Elementor\CSS_Stack();
+		$this->compatibility = new Compatibility();
+		$this->skins         = new Elementor\Skins();
 	}
 
 	/**
-	 * Plugin constructor.
+	 * Load required files.
+	 *
+	 * @return void
 	 */
-	private function __construct() {
-
-		$this->register_autoloader();
-
-		add_action( 'init', array( $this, 'init_components' ), 20 );
+	public function load_files() {
+		require JET_SM_PATH . 'includes/gutenberg/jet-sm-gutenberg-integration.php';
 	}
 
 }
