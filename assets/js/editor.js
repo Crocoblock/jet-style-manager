@@ -15,30 +15,41 @@
 
 			window.elementor.hooks.addFilter( 'elements/widget/contextMenuGroups', function( groups, element ) {
 
-				groups.push( {
-					name: 'jet_sm_skins',
-					actions: [{
-						name: 'jet_sm_skins_save',
-						icon: 'eicon-save',
-						title: 'Save as Skin',
-						isVisible: true,
-						callback: JetSM.showSkinsPopup.bind( {
-							element: element,
-						} )
-					}, {
-						name: 'jet_sm_skins_apply',
-						icon: 'eicon-arrow-down',
-						title: 'Apply Skin',
-						isVisible: true,
-						callback: JetSM.applySkinPopup.bind( { element: element } )
-					}, {
-						name: 'jet_sm_skins_reset',
-						icon: 'eicon-close',
-						title: 'Reset Skin',
-						isVisible: true,
-						callback: JetSM.resetSkin.bind( { element: element } )
-					}]
-				} );
+				try {
+
+					if ( -1 !== element.options.model.attributes.widgetType.search('jet-') ) {
+
+						groups.push( {
+							name: 'jet_sm_skins',
+							actions: [{
+								name: 'jet_sm_skins_save',
+								icon: 'eicon-save',
+								title: 'Save as Skin',
+								isVisible: true,
+								callback: JetSM.showSkinsPopup.bind( {
+									element: element,
+								} )
+							}, {
+								name: 'jet_sm_skins_apply',
+								icon: 'eicon-arrow-down',
+								title: 'Apply Skin',
+								isVisible: true,
+								callback: JetSM.applySkinPopup.bind( { element: element } )
+							}, {
+								name: 'jet_sm_skins_reset',
+								icon: 'eicon-close',
+								title: 'Reset Skin',
+								isVisible: true,
+								callback: JetSM.resetSkin.bind( { element: element } )
+							}]
+						} );
+
+					}
+
+				} catch (e) {
+					console.log( e, element );
+					return groups;
+				}
 
 				return groups;
 			} );

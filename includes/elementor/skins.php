@@ -169,7 +169,8 @@ class Skins {
 		$render->render_styles( $skins, false, true, $query_relation );
 		$render->enqueue_hidden_fonts( $skins, $query_relation );
 		$css = ob_get_clean();
-		$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
+
+		//$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
 
 		wp_send_json_success( array(
 			'css' => $css,
@@ -188,7 +189,7 @@ class Skins {
 		}
 
 		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
-		$skin   = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
+		$skin   = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
 		$render = new CSS_Render();
 
 		ob_start();
@@ -196,8 +197,6 @@ class Skins {
 		$render->enqueue_hidden_fonts( array( 'widget' => $widget, 'skin' => $skin ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
 		$css = ob_get_clean();
-
-		$css = str_replace( '.elementor .elementor-inner', 'body #elementor.elementor .elementor-inner', $css );
 
 		wp_send_json_success( array(
 			'class_name' => $this->get_skin_class_name( $skin, $widget ),
@@ -233,7 +232,6 @@ class Skins {
 		) );
 
 		wp_send_json_success( array( 'skins' => $skins ) );
-
 	}
 
 	/**
@@ -248,7 +246,7 @@ class Skins {
 		}
 
 		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
-		$skin   = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
+		$skin   = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
 
 		Plugin::instance()->db->delete_row( array(
 			'widget' => $widget,
@@ -256,7 +254,6 @@ class Skins {
 		) );
 
 		$this->get_skins_for_widget();
-
 	}
 
 	/**
@@ -271,7 +268,7 @@ class Skins {
 		}
 
 		$widget   = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
-		$name     = $_REQUEST['name'] ? sanitize_key( $_REQUEST['name'] ) : false;
+		$name     = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
 		$settings = $_REQUEST['values'] ? $this->sanitize( json_decode( wp_unslash( $_REQUEST['values'] ), true ) ) : array();
 
 		$element_type = \Elementor\Plugin::$instance->widgets_manager->get_widget_types( $widget );

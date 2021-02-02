@@ -79,10 +79,8 @@ class CSS_Stack {
 		if ( false === $this->stack ) {
 
 			if ( ! self::$hooked ) {
-				$name = $this->get_css_file_name();
-
 				add_action( 'elementor/element/parse_css', [ $this, 'process_element' ], 10, 2 );
-				add_action( "elementor/css-file/{$name}/parse", [ $this, 'process_stack' ] );
+				add_action( "elementor/css-file/post/parse", [ $this, 'process_stack' ] );
 				self::$hooked = true;
 			}
 

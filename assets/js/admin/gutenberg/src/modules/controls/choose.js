@@ -62,25 +62,26 @@ class Choose extends BaseControl {
 			let option = options[ key ],
 				icon;
 
-			if( -1 !== option.icon.search('dashicons-') ){
-				icon = option.icon.replace( 'dashicons-', '' );
-			} else if ( -1 !== option.icon.search('fa-') ) {
-				icon = <i className={ option.icon }></i>;
-			} else {
-				icon = option.icon
+			if( option.icon ){
+				if( -1 !== option.icon.search('dashicons-') ){
+					icon = option.icon.replace( 'dashicons-', '' );
+				} else if ( -1 !== option.icon.search('fa-') ) {
+					icon = <i className={ option.icon }></i>;
+				} else {
+					icon = option.icon
+				}
 			}
 
 			outputOptions.push( <ToolbarButton
 				key={ key }
 				icon={ icon }
-				label={ option.label }
 				shortcut={ option.shortcut }
 				iconSize={ icon_size }
 				showTooltip={ show_tooltip }
 				tooltipPosition={ tooltip_position }
 				onClick={ () => { this.setValue( key ) } }
 				className={ key === value ? 'is-active-option' : '' }
-			/> );
+			>{ option.label }</ToolbarButton>);
 		}
 
 		return ( <div className={ class_name + '-options' }>{ outputOptions }</div> );

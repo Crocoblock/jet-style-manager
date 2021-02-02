@@ -55,7 +55,7 @@ class CSS_Render {
 		ob_start();
 		$this->render_styles( array( 'post_id' => $post_id ), null, true );
 		$css = ob_get_clean();
-		$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
+		//$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
 
 		echo $css;
 
@@ -247,7 +247,6 @@ class CSS_Render {
 			$load_level = Plugin::instance()->compatibility->get_plugin_level( $set['plugin'] );
 			$visible_on = absint( $set['visible_on'] );
 
-		//Need to fix load level, stopped working in Elementor 2.9.0+
 			if ( $visible_on > $load_level ) {
 				$css = $set['styles'];
 
