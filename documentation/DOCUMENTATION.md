@@ -19,7 +19,7 @@ Example:
     		[
     			'id'          => 'item_style',
     			'initialOpen' => true,
-    			'title'       => esc_html__( 'Item', 'jet-plugin' )
+    			'title'       => esc_html__( 'Item', 'jet-plugin' ),
     		]
     	);
     	/*
@@ -35,10 +35,10 @@ Example:
     function register_gutenberg_block() {
         register_block_type(
     		 'jet-plugin/my-amazing-block',
-    		array(
+    		[
     			'attributes'      => [],
     			'render_callback' => 'amazing_render_callback',
-    		)
+    		]
     	);
     }
 ?>
@@ -49,27 +49,30 @@ Example:
 
 # Adding Options
 Methods for adding style options. After adding styles, a sidebar button with styles will appear in the editor.
+
 ![sidebar](https://github.com/Crocoblock/jet-style-manager/blob/master/documentation/sidebar.png)
 
 ## start_section
 Opens a section wrapper for options (toggle)
+
 ![sidebar](https://github.com/Crocoblock/jet-style-manager/blob/master/documentation/section.png)
+
 ##### Arguments:
 * `sidebar_name` - Sidebar slug to which options will be added. Works only if the function was used.
     *Values*: `style_controls` | `controls` - Works only if the function [register_block
     ](#) used.
-    *Default*: `style_controls`,
+    *Default*: `style_controls`
 * args
     * `id` - Section ID. Must be unique.
     * `class_name` - Section CSS class.
-    *Default*: `jet-st-section`,
+    *Default*: `jet-st-section`
     * `title` - Section title.
-        *Default*: `''`,
+        *Default*: `''`
     * `icon` -  Section icon. You can use inline SVG or [Dashicons
-    ](https://developer.wordpress.org/resource/dashicons/#arrow-right-alt2)  *Default*: `''`,
+    ](https://developer.wordpress.org/resource/dashicons/#arrow-right-alt2)    *Default*: `''`
     * `initial_open` - Section open or closed when block is selected
         *Values*: `true` | `false`
-        *Default*: `false`,
+        *Default*: `false`
 
 Example:
 
@@ -80,17 +83,96 @@ Example:
 		[
 			'id'          => 'section_content_style',
 			'initialOpen' => true,
-			'title'       => esc_html__( 'Content', 'jet-smart-filters' )
+			'title'       => esc_html__( 'Content', 'jet-plugin' ),
 		]
 	);
 ?>
 ```
 ## end_section
 Closes a section.
+Example:
+```php
+<?php
+    $controls_manager->end_section();
+?>
+```
+
+## start_tabs
+Opens a wrapper for tabs.
+![sidebar](https://github.com/Crocoblock/jet-style-manager/blob/master/documentation/tabs.png)
+
+##### Arguments:
+* `sidebar_name` - Sidebar slug to which options will be added. Works only if the function was used.
+    *Values*: `style_controls` | `controls` - Works only if the function [register_block
+    ](#) used.
+    *Default*: `style_controls`
+* args
+    * `id` - Tabs ID. Must be unique.
+    * `class_name` - Tabs wrapper CSS class.
+    *Default*: `jet-st-tabs`
+    * `active_class` - Active tab CSS class.
+    *Default*: `jet-st-active-tab`
+    * `orientation` - Tabs type
+    *Values*: `horizontal` | `vertical`
+    *Default*: `horizontal`
+    * `initialTabName` - Name of the tab that will be active
+    *Default*: `''`
+    * `separator` - Separator between options
+    *Values*: `before` | `after`| `both`
+    *Default*: `''`
 
 Example:
 ```php
 <?php
-    $controls_manager->start_section();
+	$controls_manager->start_tabs(
+		'style_controls',
+		[
+			'id'         => 'style_tabs',
+			'separator'  => 'both',
+		]
+	);
+?>
+```
+
+## end_tabs
+Closes a wrapper for tabs.
+Example:
+```php
+<?php
+	$controls_manager->end_tabs();
+?>
+```
+## start_tab
+Open new tab.
+
+##### Arguments:
+* `sidebar_name` - Sidebar slug to which options will be added. Works only if the function was used.
+    *Values*: `style_controls` | `controls` - Works only if the function [register_block
+    ](#) used.
+    *Default*: `style_controls`
+* args
+    * `id` - Tab ID. Must be unique.
+    * `title` - Tab name.
+    *Default*: `''`
+
+Example:
+```php
+<?php
+	$controls_manager->start_tab(
+		'style_controls',
+		[
+			'id'    => 'normal_styles',
+			'title' => esc_html__( 'Normal', 'jet-plugin' ),
+		]
+	);
+?>
+```
+
+## end_tab
+Close tab.
+Example:
+```php
+<?php
+	$controls_manager->end_tab();
 ?>
 ```
