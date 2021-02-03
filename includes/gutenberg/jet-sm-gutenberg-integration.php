@@ -28,7 +28,7 @@ class JET_SM_Gutenberg_Integration {
 	 */
 	public function __construct(){
 		if( class_exists( 'JET_SM\Gutenberg\Block_Manager' ) && class_exists( 'JET_SM\Gutenberg\Block_Manager' ) ){
-			add_action( 'init', [ $this, 'set_style_manager_instance' ],-500 );
+			add_action( 'init', [ $this, 'set_style_manager_instance' ], 20 );
 		}
 	}
 
@@ -46,7 +46,7 @@ class JET_SM_Gutenberg_Integration {
 	 *
 	 * @return boolean
 	 */
-	public function register_style_for_block( $slug ){
+	public function register_style_for_block( $name ){
 		return new JET_SM\Gutenberg\Controls_Manager( $slug );
 	}
 
@@ -70,7 +70,7 @@ class JET_SM_Gutenberg_Integration {
 	}
 }
 
-function jet_sm_register_style_for_block( $slug = false ){
+function jet_sm_register_style_for_block( $name = false ){
 
 	if( ! $slug ){
 

@@ -113,7 +113,7 @@ class Controls_Manager {
 		return $attribute_ids;
 	}
 
-	public function add_control( $args = [], $control_stack_name = 'controls' ){
+	public function add_control( $args = [], $control_stack_name = 'style_controls' ){
 		if( empty( $args['id'] ) ){
 			esc_html_e( 'Property "id" is empty in type ' . $args['type'], 'jet-styles-manager' );
 		}
