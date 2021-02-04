@@ -25,10 +25,9 @@ class BaseControl{
 			css_selector: '',
 			not_wrap: false,
 			default_intervals: { step: 0.1, min: -2, max:20, initialPosition: 0 },
-			conditions: [],
+			//conditions: [],
 			class_name: '',
 			label: '',
-			separator: 'none',
 			hide_label_from_vision: false,
 			help: '',
 		};
