@@ -38,7 +38,6 @@ class Range extends BaseControl {
 			show_tooltip: false,
 			with_input_field: true,
 			separator_type: 'none', // none | fullWidth | topFullWidth
-			type: 'number',
 			units: [
 				{ value: 'px', label: 'PX', intervals: { step: 1, min: 0, max:200, initialPosition: 14 } },
 			],

@@ -28,14 +28,14 @@ class JET_SM_Gutenberg_Integration {
 	 */
 	public function __construct(){
 		if( class_exists( 'JET_SM\Gutenberg\Block_Manager' ) && class_exists( 'JET_SM\Gutenberg\Block_Manager' ) ){
-			add_action( 'init', [ $this, 'set_style_manager_instance' ], 20 );
+			$this->set_style_manager_instance();
 		}
 	}
 
 	/**
 	 * Set style manager class instance
 	 *
-	 * @return boolean
+	 * @return object
 	 */
 	public function  set_style_manager_instance(){
 		$this->block_manager = JET_SM\Gutenberg\Block_Manager::get_instance();
@@ -44,10 +44,19 @@ class JET_SM_Gutenberg_Integration {
 	/**
 	 * Set style manager class instance
 	 *
-	 * @return boolean
+	 * @return object
 	 */
 	public function register_style_for_block( $name ){
 		return new JET_SM\Gutenberg\Controls_Manager( $slug );
+	}
+
+	/**
+	 * Set style manager class instance
+	 *
+	 * @return object
+	 */
+	public function register_block( $name = null, $args = [] ){
+		return $this->block_manager->register_block( $name, $args );
 	}
 
 	/**
@@ -80,4 +89,16 @@ function jet_sm_register_style_for_block( $name = false ){
 	}
 
 	return JET_SM_Gutenberg_Integration::get_instance()->register_style_for_block( $slug );
+}
+
+function jet_sm_register_block( $name = null, $args = [] ){
+
+	if( ! $name ){
+
+		echo 'Not $name parameter in function "jet_sm_register_block"';
+
+		return;
+	}
+
+	return JET_SM_Gutenberg_Integration::get_instance()->register_block( $name, $args );
 }
