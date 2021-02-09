@@ -47,7 +47,7 @@ class JET_SM_Gutenberg_Integration {
 	 * @return object
 	 */
 	public function register_style_for_block( $name ){
-		return new JET_SM\Gutenberg\Controls_Manager( $slug );
+		return new JET_SM\Gutenberg\Controls_Manager( $name );
 	}
 
 	/**
@@ -81,14 +81,14 @@ class JET_SM_Gutenberg_Integration {
 
 function jet_sm_register_style_for_block( $name = false ){
 
-	if( ! $slug ){
+	if( ! $name ){
 
-		echo 'Not slug parameter in function "jet_sm_register_style_for_block"';
+		echo 'Not $name parameter in function "jet_sm_register_style_for_block"';
 
 		return;
 	}
 
-	return JET_SM_Gutenberg_Integration::get_instance()->register_style_for_block( $slug );
+	return JET_SM_Gutenberg_Integration::get_instance()->register_style_for_block( $name );
 }
 
 function jet_sm_register_block( $name = null, $args = [] ){
