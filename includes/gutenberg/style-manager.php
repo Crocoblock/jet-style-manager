@@ -95,9 +95,9 @@ class Style_Manager {
 	}
 
 	public function get_blocks_style( $ID = false ){
+		global $post;
 
 		if( ! $ID && isset( $post ) ){
-			global $post;
 
 			$ID = $post->ID;
 		}
