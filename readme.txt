@@ -16,3 +16,9 @@ JetStyleManager is a plugin that extends the functionalities of Gutenberg. Combi
 
 **For developers**
 If you've got one or more plugins with Gutenberg blocks, JetStyleManager can offer you and your users an API for handy block styles management. As a developer, you get a convenient API that lets you add any custom styles supporting media queries, generate styles in a separate file, and manage them via 10+ different types of controls. Your users get a convenient UI and the ability to customize more styles than allowed by the standard Gutenberg UI. With this solution, you no longer need to add your own APIs for setting and compiling styles in every plugin used. This will ensure high performance both in the editor and on the frontend.
+
+== Developers ==
+
+Guide how to integrate JetStyleManager into your blocks plugins you can find <a href="https://github.com/Crocoblock/jet-style-manager/blob/master/documentation/DOCUMENTATION.md" target="_blank">here</a>
+
+Please, feel free to <a href="https://github.com/Crocoblock/jet-style-manager/issues" target="_blank">ask any questions</a> about your plugin integration.
