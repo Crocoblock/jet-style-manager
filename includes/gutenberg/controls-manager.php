@@ -32,6 +32,7 @@ class Controls_Manager {
 	public function __construct( $block_slug = null ) {
 		$this->block_slug = $block_slug;
 		$this->style_manager_instant = Style_Manager::get_instance();
+		$this->add_extra_atributes();
 		$this->set_breakpoints();
 
 		add_action( 'wp_enqueue_scripts',       [ $this, 'before_set_block_controls' ], 9 );
@@ -41,8 +42,22 @@ class Controls_Manager {
 		add_filter( 'register_block_type_args', [ $this, 'add_block_attributes' ], 10, 2 );
 	}
 
+	private function add_extra_atributes(){
+		$extra_atributes = [
+			'id'   => 'extra_args',
+			'type' => 'extra-atributes',
+		];
+
+		self::$style_controls[ $this->block_slug ][] = $extra_atributes;
+		self::$controls[ $this->block_slug ][]       = $extra_atributes;
+	}
+
 	public function add_block_attributes( $args, $name ){
-		if( $name === $this->block_slug && empty( $args['blockID'] ) ) {
+
+		if( $name === $this->block_slug && empty( $args['attributes']['blockID'] ) ) {
+			$style_controls = isset( self::$style_controls[ $this->block_slug ] ) ? self::$style_controls[ $this->block_slug ] : [] ;
+			$controls = isset( self::$controls[ $this->block_slug ] ) ? self::$controls[ $this->block_slug ] : [] ;
+
 			$args['attributes']['blockID'] = [
 				'type'    => 'string',
 				'default' => '',
@@ -51,9 +66,6 @@ class Controls_Manager {
 				'type'    => 'string',
 				'default' => 'desktop',
 			];
-
-			$style_controls = isset( self::$style_controls[ $this->block_slug ] ) ? self::$style_controls[ $this->block_slug ] : [] ;
-			$controls = isset( self::$controls[ $this->block_slug ] ) ? self::$controls[ $this->block_slug ] : [] ;
 
 			$args['attributes'] = array_merge(
 				$args['attributes'],

@@ -42,10 +42,21 @@ class Block_Manager {
 	public function __construct(){
 		$this->script_dependencies = apply_filters( 'jet_style_manager/gutenberg/script_dependencies', $this->script_dependencies );
 
-		add_action( 'enqueue_block_assets', [ $this, 'localize_scripts' ], 1, 0 );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'load_scripts' ], 2, 0 );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'load_editor_scripts' ], 0, 0 );
+		add_action( 'enqueue_block_assets',        [ $this, 'localize_scripts' ],    1, 0 );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'load_scripts' ],        2, 0 );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'load_editor_scripts' ], 3, 0 );
+		add_filter( 'admin_body_class',            [ $this, 'add_body_class' ],     10, 1 );
 	}
+
+	public function add_body_class( $classes ){
+
+		if( WP_DEBUG ){
+			$classes .= ' is_debug_mod';
+		}
+
+		return $classes;
+	}
+
 
 	public function register_block( $slug = null, $args = [] ){
 
@@ -96,7 +107,7 @@ class Block_Manager {
 			JET_SM_URL . 'assets/js/admin/gutenberg/jet-sm-gb.js',
 			$this->script_dependencies,
 			JET_SM_VERSION,
-			true
+			is_admin() ? false : true
 		);
 
 		wp_enqueue_script( self::SCRIPT_SLUG );

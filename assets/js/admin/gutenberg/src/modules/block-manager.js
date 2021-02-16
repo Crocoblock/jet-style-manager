@@ -1,5 +1,6 @@
 "use strict";
 
+import { ExtraAtributes } from "./controls/extra-atributes";
 import { StartSection } from "./controls/section";
 import { StartTabs, StartTab } from "./controls/tabs";
 import { Input } from "./controls/input";
@@ -21,13 +22,14 @@ class JetBlockManager {
 		var self = this;
 
 		self.setControlsInstance();
-		self.setBlockID();
-		self.registerBlockStyle();
+		self.addAttributes();
 		self.registerBlocks();
+		self.registerBlockStyle();
 	}
 
 	setControlsInstance() {
 		window.jetSmControlCallback = {
+			ExtraAtributes: ExtraAtributes,
 			StartSection: StartSection,
 			StartTabs: StartTabs,
 			StartTab: StartTab,
@@ -114,6 +116,7 @@ class JetBlockManager {
 			blockNames = Object.keys( blocks ),
 			blockArgs  = [];
 
+
 		for ( let block in blocks ) {
 			blockArgs[ block ] = [];
 			blockArgs[ block ]['attributes'] = self.getAtributes( self.getControlsInstant( blocks[ block ] ) );
@@ -123,6 +126,7 @@ class JetBlockManager {
 			'blocks.registerBlockType',
 			'jet-styles-manager',
 			( props, name ) => {
+
 				if( -1 === blockNames.indexOf( name ) ){
 					return props;
 				}
@@ -163,8 +167,7 @@ class JetBlockManager {
 		);
 	}
 
-	//Add wrapper to blocks.
-	setBlockID(){
+	addAttributes(){
 		let allBlocks = this.getAllBlockSteck();
 
 		if( ! allBlocks ){
@@ -172,34 +175,17 @@ class JetBlockManager {
 		}
 
 		addFilter(
-			'editor.BlockEdit',
-			'jet-styles-manager',
-			( BlockEdit ) => {
-				return ( props ) => {
-					//Set block ID
-					if( -1 !== allBlocks.indexOf( props.name ) && props.attributes && ! props.attributes.blockID && props.isSelected ){
-						let id = 'jet-sm-gb-' + props.clientId,
-							className = ( props.className || '' ) + " jet-sm-gb-wrapper " + id;
-
-						props.setAttributes( { blockID: id, className: className } );
-					}
-
-					return <BlockEdit { ...props } />;
-				}
-			}
-		);
-
-		addFilter(
 			'editor.BlockListBlock',
 			'jet-styles-manager',
 			( BlockListBlock ) => {
 				return ( props ) => {
+
 					if( -1 === allBlocks.indexOf( props.name ) ){
 						return <BlockListBlock { ...props } />;
 					}
 
 					let id = props.attributes.blockID,
-						className = ( props.className || '' ) + " jet-sm-gb-wrapper " + id;
+						className = props.attributes.className;
 
 					return <BlockListBlock { ...props } id={ id } className={ className } />;
 				}
@@ -207,7 +193,7 @@ class JetBlockManager {
 		);
 	}
 
-	///function return class instance
+	/// Function return class instance
 	getControlsInstant( controlsStack ) {
 		if( ! controlsStack ){
 			return null;
@@ -255,24 +241,18 @@ class JetBlockManager {
 				continue;
 			}
 
-			atributes[ control.args.id ] = ( control.args.css_selector ) ? Object.assign( { source: 'children' }, control.attributes ) : control.attributes ;
-		}
+			if( 'extra-atributes' === control.attributes.type ){
+				atributes = Object.assign(
+					{},
+					atributes,
+					control.attributes
+				);
 
-		if( ! atributes.blockID ){
-			atributes = Object.assign(
-				{},
-				atributes,
-				{
-					blockID:{
-						type: 'string',
-						default: '',
-					},
-					curentBreakpoints:{
-						type: 'string',
-						default: 'desktop',
-					},
-				}
-			);
+				delete atributes['id'];
+				delete atributes['type'];
+			}else{
+				atributes[ control.args.id ] = ( control.args.css_selector ) ? Object.assign( { source: 'children' }, control.attributes ) : control.attributes ;
+			}
 		}
 
 		return atributes;
@@ -343,7 +323,5 @@ class JetBlockManager {
 		return allBlocks;
 	}
 }
-new JetBlockManager()
-/*window.onload = function(e){
-	setTimeout( () => { new JetBlockManager() }, 700 );
-};*/
+
+new JetBlockManager();

@@ -86,17 +86,18 @@ function JetStyleManagerMeta(){
 		let blockIDs = [];
 
 		for ( let block in blockList ) {
-			let innerBlocks = blockList[ block ].innerBlocks;
+			let innerBlocks = blockList[ block ].innerBlocks,
+				blockID = blockList[ block ].attributes.blockID;
 
 			if ( innerBlocks && innerBlocks[ 0 ] ){
 				blockIDs.push( ...getBlockList( innerBlocks ) );
 			}
 
-			if( ! blockList[ block ].attributes.blockID ){
+			if( ! blockID ){
 				continue;
 			}
 
-			blockIDs.push( blockList[ block ].attributes.blockID );
+			blockIDs.push( blockID );
 		}
 
 		return blockIDs;

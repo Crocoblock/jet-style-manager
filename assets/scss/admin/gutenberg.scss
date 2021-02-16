@@ -176,4 +176,20 @@
 			}
 		}
 	}
+
+// debag mode
+	.jet-sm-gb-block-info{
+		display: none;
+	}
+	.is_debug_mod & .jet-sm-gb-block-info{
+		display: block;
+		background-color: #fcff0c;
+		padding: 10px;
+		h3{
+			margin: 0 0 5px;
+		}
+		.components-base-control{
+			margin-top: 20px;
+		}
+	}
 }

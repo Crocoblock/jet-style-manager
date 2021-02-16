@@ -488,6 +488,16 @@ Example:
     'css_selector'  => array(
       '{{WRAPPER}}  .my_html_element' => 'padding: {{TOP}} {{RIGHT}} {{BOTTOM}} {{LEFT}};',
     ),
+    'attributes' => [
+      'default' => [
+        'value' =>[
+          'top' => '50px',
+          'left' =>'10%',
+          'right' => '10%',
+          'bottom' => '50px',
+        ],
+      ],
+    ],
   ]);
 ?>
 ```

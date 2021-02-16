@@ -24,14 +24,20 @@ class Style_Manager {
 	}
 
 	public function wrap_block( $block_content, $block ) {
-		$blockName = $block['blockName'];
-		$attr = $block['attrs'];
+		if( ! $block['blockName'] ){
+			return $block_content;
+		}
 
-		if( ! empty( $attr['blockID'] ) && ( array_key_exists( $blockName, Controls_Manager::$controls ) || array_key_exists( $blockName, Controls_Manager::$style_controls ) ) ){
+		$blockName = $block['blockName'];
+
+		if( ! empty( $block['attrs']['blockID'] ) && ( array_key_exists( $blockName, Controls_Manager::$controls ) || array_key_exists( $blockName, Controls_Manager::$style_controls ) ) ){
+			$attr    = $block['attrs'];
+			$blockID = $attr['blockID'];
+
 			$className     = apply_filters( $blockName . '/class-name', $attr['className'] );
 			$filter_id     = ! empty( $attr['filter_id'] ) ? 'data-id="' . $attr['filter_id'] . '"' : '';
 			$format        = apply_filters( 'jet_style_manager/gutenberg/block_wrapper_format', '<div class="%1$s" data-block-id="%2$s" %3$s>%4$s</div>' );
-			$block_content = sprintf( $format, $className, $attr['blockID'], $filter_id, $block_content );
+			$block_content = sprintf( $format, $className, $blockID, $filter_id, $block_content );
 		}
 
 		return $block_content;
@@ -86,11 +92,11 @@ class Style_Manager {
 		return $meta;
 	}
 
-	public function render_blocks_style( $ID = false ){
+	public function render_blocks_style( $ID = false, $format = '<style class="jet-sm-gb-style">%s</style>' ){
 		$style = $this->get_blocks_style( $ID );
 
 		if( $style ){
-			printf( '<style class="jet-sm-gb-style">%s</style>', $style );
+			printf( $format, $style );
 		}
 	}
 
