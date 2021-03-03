@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.1.5
+* FIX: Block wrapper
+
 ## 1.1.4
 * FIX: Typography control
 

@@ -34,7 +34,7 @@ class Style_Manager {
 			$attr    = $block['attrs'];
 			$blockID = $attr['blockID'];
 
-			$className     = apply_filters( $blockName . '/class-name', $attr['className'] );
+			$className     = apply_filters( $blockName . '/class-name', isset( $attr['className'] ) ? $attr['className'] : $blockID );
 			$filter_id     = ! empty( $attr['filter_id'] ) ? 'data-id="' . $attr['filter_id'] . '"' : '';
 			$format        = apply_filters( 'jet_style_manager/gutenberg/block_wrapper_format', '<div class="%1$s" data-block-id="%2$s" %3$s>%4$s</div>' );
 			$block_content = sprintf( $format, $className, $blockID, $filter_id, $block_content );
