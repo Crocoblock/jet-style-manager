@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.1.6
+* ADD: hooks for implementing custom sections and controls
+
 ## 1.1.5
 * FIX: Block wrapper
 
