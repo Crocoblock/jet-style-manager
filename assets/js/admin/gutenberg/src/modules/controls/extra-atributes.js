@@ -19,7 +19,6 @@ class ExtraAtributes {
 
 	init( props ) {
 		if( props.isSelected && props.attributes && ! props.attributes.blockID ){
-			console.log('setBlockID');
 
 			let id = `jet-sm-gb-${ props.clientId }`,
 				className;

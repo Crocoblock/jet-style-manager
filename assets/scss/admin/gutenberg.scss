@@ -13,6 +13,15 @@
 		}
 	}
 
+//Panel button
+	.interface-pinned-items{
+		.components-button{
+			.dashicons-admin-customizer{
+				margin-right: 2px;
+			}
+		}
+	}
+
 //Control Wrapper
 	.jet-sm-gb-control-wrapper{
 		.components-base-control{
@@ -132,6 +141,9 @@
 						}
 						&:focus{
 							box-shadow: none;
+						}
+						.dashicons{
+							margin-right: 2px;
 						}
 					}
 				}

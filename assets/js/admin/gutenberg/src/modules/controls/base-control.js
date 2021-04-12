@@ -169,8 +169,9 @@ class BaseControl{
 				value: value,
 				blockID : blockID,
 				css_selector : args.css_selector || null,
-				breakpoints : args.breakpoints || null,
+				breakpoints : args.breakpoints || 'desktop',
 				isInitSet : isInitSet,
+				controlType : args.type,
 			};
 
 		if( ! window.jetSmControlsValues[ blockID ] ){

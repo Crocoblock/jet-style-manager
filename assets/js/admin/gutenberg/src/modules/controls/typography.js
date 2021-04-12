@@ -117,6 +117,29 @@ class Typography extends BaseControl {
 		}
 	}
 
+	parseFontFamily( family ){
+		let output = [ { label: 'Default', value: 'inherit' } ];
+
+		for ( const [ key, value ] of Object.entries( family ) ) {
+			output.push( { label: value.family, value: key } )
+		}
+
+		return output;
+	}
+
+	parseFontWeight( weight ) {
+		let output = [{label: 'Normal', value: ''}];
+
+		for ( let value of weight ) {
+			if( 'regular' === value ){
+				continue;
+			}
+			output.push( { label: value, value: value } )
+		}
+
+		return output;
+	}
+
 	renderControl(){
 		let {
 			family,
@@ -140,7 +163,14 @@ class Typography extends BaseControl {
 		} = this.args;
 
 		let controlValue = Object.assign( {}, this.attributes.default.value, this.getValue() ),
-			value = controlValue;
+			value = controlValue,
+			curentFont = window.jetSmFonts && value.family ? window.jetSmFonts[ value.family ] : '' ;
+
+		family = window.jetSmFonts ? this.parseFontFamily( window.jetSmFonts ) : family;
+
+		/* to be or not to be ????
+		weight = curentFont ? this.parseFontWeight( curentFont.variants ) : weight ;
+		value.weight = curentFont && curentFont.variants.includes( value.weight ) ? value.weight : 'normal' ;*/
 
 		return (
 			<div>

@@ -23,6 +23,10 @@ class Controls_Manager {
 
 	private $wrapper_type = null;
 
+	public $fonts_manager = null;
+
+	public static $fonts = [];
+
 	private $wrapper = [
 		'section' => null,
 		'tabs' => null,
@@ -31,7 +35,9 @@ class Controls_Manager {
 
 	public function __construct( $block_slug = null ) {
 		$this->block_slug = $block_slug;
+		$this->fonts_manager = new Fonts_Manager( [ 'path' => JET_SM_PATH ] );
 		$this->style_manager_instant = Style_Manager::get_instance();
+		$this->init_font_manager();
 		$this->add_extra_atributes();
 		$this->set_breakpoints();
 
@@ -40,6 +46,12 @@ class Controls_Manager {
 		add_action( 'admin_enqueue_scripts',    [ $this, 'before_set_block_controls' ], 9 );
 		add_action( 'admin_enqueue_scripts',    [ $this, 'set_block_controls' ] );
 		add_filter( 'register_block_type_args', [ $this, 'add_block_attributes' ], 10, 2 );
+	}
+
+	public function init_font_manager(){
+		if ( is_admin() && empty( self::$fonts ) ){
+			self::$fonts = array_merge( $this->fonts_manager->get_fonts('standard'), $this->fonts_manager->get_fonts('google') );
+		}
 	}
 
 	private function add_extra_atributes(){
@@ -292,6 +304,13 @@ class Controls_Manager {
 				self::SCRIPT_SLUG,
 				'jetSmBlockStyleControl',
 				self::$style_controls
+			);
+		}
+		if( ! empty( self::$fonts ) ){
+			wp_localize_script(
+				self::SCRIPT_SLUG,
+				'jetSmFonts',
+				self::$fonts
 			);
 		}
 	}

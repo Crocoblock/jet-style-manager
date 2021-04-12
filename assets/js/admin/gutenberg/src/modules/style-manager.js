@@ -7,16 +7,22 @@ function JetStyleManagerMeta(){
 
 	const styleSlug      = '_jet_sm_style',
 		  readyStyleSlug = '_jet_sm_ready_style',
-		  controlsValues = '_jet_sm_controls_values';
+		  controlsValues = '_jet_sm_controls_values',
+		  fontCollectionSlug = '_jet_sm_fonts_collection',
+		  fontLinks = '_jet_sm_fonts_links',
+		  fontsAPIlink = 'https://fonts.googleapis.com/css2?';
 
-	let postMeta     = select('core/editor').getEditedPostAttribute('meta') || { [ styleSlug ]: '', [ readyStyleSlug ]: '', [ controlsValues ]: '' },
-		blockStyle   = postMeta[ styleSlug ] ? JSON.parse( postMeta[ styleSlug ] ) : {},
-		blocksOption = {},
-		updPostMeta  = {};
+	let postMeta        = select('core/editor').getEditedPostAttribute('meta') || { [ styleSlug ]: '', [ readyStyleSlug ]: '', [ controlsValues ]: '' },
+		blockStyle      = postMeta[ styleSlug ] ? JSON.parse( postMeta[ styleSlug ] ) : {},
+		fontsCollection = postMeta[ fontCollectionSlug ] ? JSON.parse( postMeta[ fontCollectionSlug ] ) : {},
+		blocksOption    = {},
+		updPostMeta     = {},
+		readyFontLinks  = '';
 
 	window.jetSmControlsValues = postMeta[ controlsValues ] ? JSON.parse( postMeta[ controlsValues ] ) : {} ;
 
 	if ( Object.keys( blockStyle )[0] ) {
+		parsedFontsCollection( fontsCollection );
 		renderStyle( blockStyle );
 		select( 'core/editor' ).isEditedPostAutosaveable = () => false;
 	}
@@ -46,6 +52,7 @@ function JetStyleManagerMeta(){
 		let {
 			id,
 			blockID,
+			controlType
 		} = event.detail;
 
 		if( ! blockStyle[ blockID ] ){
@@ -63,9 +70,11 @@ function JetStyleManagerMeta(){
 		} else {*/
 			blocksOption[ blockID ][ id ] = event.detail;
 		//}
-
-
 		clearMeta();
+
+		if( 'typography' === controlType ){
+			collectFonts( event.detail );
+		}
 		collectStyle( blockID );
 	}
 
@@ -75,6 +84,7 @@ function JetStyleManagerMeta(){
 		for ( let blockStyleId in blockStyle ) {
 			if( -1 === blockIDs.indexOf( blockStyleId ) ){
 				delete blockStyle[ blockStyleId ];
+				delete fontsCollection[ blockStyleId ];
 				delete window.jetSmControlsValues[ blockStyleId ];
 			}
 		}
@@ -101,6 +111,113 @@ function JetStyleManagerMeta(){
 		}
 
 		return blockIDs;
+	}
+
+	function collectFonts( { blockID, id, value, breakpoints } ){
+
+		let { family, weight, style } = ! breakpoints || 'desktop' === breakpoints ? value.value : value[ breakpoints ],
+			fontFamily = family.replace(/,\s*[\S\s]*/gm, '' );
+
+		if( ! window.jetSmFonts[ family ] || "google" !== window.jetSmFonts[family].type ){
+			return;
+		}
+
+		if( ! fontsCollection[ blockID ] ){
+			fontsCollection[ blockID ] = {};
+		}
+
+		if( ! fontsCollection[ blockID ][ id ] ){
+			fontsCollection[ blockID ][ id ] = {};
+		}
+
+		fontsCollection[ blockID ][ id ][ breakpoints ] = {
+			fontFamily: fontFamily,
+			fontWeight: weight,
+			fontStyle: style,
+		};
+
+		parsedFontsCollection( fontsCollection );
+	}
+
+	function parsedFontsCollection( collection = {} ){
+
+		if( ! collection ){
+			return false;
+		}
+
+		let parsedFontsCollection = {};
+
+		for ( let block in collection ){
+			if ( ! collection.hasOwnProperty( block ) ) {
+				continue;
+			}
+
+			let controls = collection[block];
+
+			for ( let control in controls ) {
+
+				if ( ! controls.hasOwnProperty( control ) ) {
+					continue;
+				}
+
+				let breakpoints = controls[ control ];
+
+				for ( let font in breakpoints ) {
+					if ( ! breakpoints.hasOwnProperty( font ) ) {
+						continue;
+					}
+
+					let { fontFamily, fontWeight, fontStyle } = breakpoints[font]
+
+					if ( ! parsedFontsCollection[ fontFamily ] ){
+						parsedFontsCollection[ fontFamily ] = {
+							family: fontFamily,
+							weight: [],
+							style: []
+						}
+					}
+
+					if( ! parsedFontsCollection[ fontFamily ].weight.includes( fontWeight ) ){
+						parsedFontsCollection[ fontFamily ].weight.push( fontWeight );
+					}
+
+					if( ! parsedFontsCollection[ fontFamily ].style.includes( fontStyle ) ){
+						parsedFontsCollection[ fontFamily ].style.push( fontStyle );
+					}
+				}
+			}
+		}
+
+		createFontLinks( parsedFontsCollection )
+	}
+
+
+	function createFontLinks( fonts = {} ){
+		if( ! fonts ){
+			return false;
+		}
+
+		readyFontLinks = '<link rel="preconnect" href="https://fonts.gstatic.com">';
+
+		for ( let font in fonts ) {
+
+			if ( ! fonts.hasOwnProperty( font ) ) {
+				continue;
+			}
+
+			let {
+					family,
+					weight,
+					style
+				} = fonts[ font ],
+				weightDelimiter = weight.length > 1 ? ':' : '&' ;
+
+			family = family.replace( /\s+/gm, '+' );
+			weight = weight.sort().join(';');
+			style = style.join(';');
+
+			readyFontLinks += `<link href="${fontsAPIlink}family=${ family }${ weightDelimiter }wght@${ weight }&display=swap" rel="stylesheet">`;
+		}
 	}
 
 	function collectStyle( blockID ){
@@ -294,10 +411,15 @@ function JetStyleManagerMeta(){
 		updPostMeta = {
 			[ readyStyleSlug ]: outputCSS,
 			[ styleSlug ]: JSON.stringify( blocks ),
-			[ controlsValues ]: JSON.stringify( window.jetSmControlsValues )
+			[ controlsValues ]: JSON.stringify( window.jetSmControlsValues ),
+			[ fontCollectionSlug ]: JSON.stringify( fontsCollection ),
+			[ fontLinks ]: JSON.stringify( readyFontLinks )
 		};
 
 		ReactDOM.render( <style>{ outputCSS }</style>, document.getElementById('jet-sm-gb-style') );
+		if( readyFontLinks ){
+			ReactDOM.render( ( <div dangerouslySetInnerHTML= {{ __html:readyFontLinks }} /> ), document.getElementById('jet-sm-gb-fonts') );
+		}
 
 		dispatch('core/editor').editPost( { meta: Object.assign( {}, postMeta, updPostMeta ) } );
 	}

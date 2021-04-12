@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.2.0
+* ADD: Integrated google fonts in typography control
+
 ## 1.1.5
 * FIX: Block wrapper
 

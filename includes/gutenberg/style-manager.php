@@ -13,10 +13,13 @@ class Style_Manager {
 
 	const STYLE_META_SLUG = '_jet_sm_ready_style';
 
+	const FONTS_SLUG = '_jet_sm_fonts_links';
+
 	const SCRIPT_SLUG = 'jet-sm-gb';
 
 	public function __construct() {
 		add_action( 'init', [ $this, 'register_meta' ], 5000 );
+		add_action( 'wp_print_footer_scripts', [ $this, 'render_blocks_fonts' ], 9 );
 		add_action( 'wp_print_footer_scripts', [ $this, 'render_blocks_style' ] );
 		add_action( 'admin_print_footer_scripts', [ $this, 'render_editor_block_style' ] );
 
@@ -79,6 +82,30 @@ class Style_Manager {
 				'sanitize_callback' => [ $this, 'sanitize_callback' ],
 			]
 		);
+
+		register_meta(
+			'post',
+			'_jet_sm_fonts_collection',
+			[
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => true,
+				'auth_callback'     => [ $this, 'auth_callback' ],
+				'sanitize_callback' => [ $this, 'sanitize_callback' ],
+			]
+		);
+
+		register_meta(
+			'post',
+			'_jet_sm_fonts_links',
+			[
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => true,
+				'auth_callback'     => [ $this, 'auth_callback' ],
+				'sanitize_callback' => [ $this, 'sanitize_callback' ],
+			]
+		);
 	}
 
 	public function get_meta(){
@@ -100,6 +127,17 @@ class Style_Manager {
 		}
 	}
 
+	public function render_blocks_fonts( $ID = false ){
+		$fonts = $this->get_blocks_fonts( $ID );
+
+		if( $fonts ){
+			$fonts = trim( $fonts, '"' );
+			$fonts = wp_unslash( $fonts );
+
+			echo wp_kses( $fonts, [ 'link' => [ 'href' => true, 'rel' => true ] ] );
+		}
+	}
+
 	public function get_blocks_style( $ID = false ){
 		global $post;
 
@@ -117,9 +155,26 @@ class Style_Manager {
 		return ! empty( $style ) ? $style : false ;
 	}
 
+	public function get_blocks_fonts( $ID = false ){
+		global $post;
+
+		if( ! $ID && isset( $post ) ){
+
+			$ID = $post->ID;
+		}
+
+		if( ! $ID ){
+			return false;
+		}
+
+		$fonts = get_post_meta( $post->ID, self::FONTS_SLUG, true );
+
+		return ! empty( $fonts ) ? $fonts : false ;
+	}
 
 	public function render_editor_block_style(){
 		echo '<div id="jet-sm-gb-style"></div>';
+		echo '<div id="jet-sm-gb-fonts"></div>';
 	}
 
 	public function auth_callback( $res, $key, $post_id, $user_id, $cap ) {
