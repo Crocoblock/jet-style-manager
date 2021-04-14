@@ -150,7 +150,7 @@ class Style_Manager {
 			return false;
 		}
 
-		$style = get_post_meta( $post->ID, self::STYLE_META_SLUG, true );
+		$style = get_post_meta( $ID, self::STYLE_META_SLUG, true );
 
 		return ! empty( $style ) ? $style : false ;
 	}
@@ -167,7 +167,7 @@ class Style_Manager {
 			return false;
 		}
 
-		$fonts = get_post_meta( $post->ID, self::FONTS_SLUG, true );
+		$fonts = get_post_meta( $ID, self::FONTS_SLUG, true );
 
 		return ! empty( $fonts ) ? $fonts : false ;
 	}
