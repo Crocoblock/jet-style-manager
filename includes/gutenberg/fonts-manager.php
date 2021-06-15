@@ -172,6 +172,11 @@
 			//delete_transient('jet_sm_google_fonts');
 			$response = get_transient( 'jet_sm_google_fonts' );
 
+			if ( is_wp_error( $response ) ) {
+				delete_transient( 'jet_sm_google_fonts' );
+				$response = false;
+			}
+
 			if( ! $response ){
 				$response = wp_remote_get( $url );
 
