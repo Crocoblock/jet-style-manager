@@ -144,7 +144,7 @@ class JetBlockManager {
 				return ( props ) => {
 
 					if( -1 === blockNames.indexOf( props.name ) ){
-						return <BlockEdit { ...props } />;
+						return <BlockEdit { ...props } key={ props.clientId } />;
 					}
 
 					let controlStack = self.renderControls( window.jetSmBlockStyleControl[ props.name ], props );

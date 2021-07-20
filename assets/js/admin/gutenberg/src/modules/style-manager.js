@@ -421,7 +421,8 @@ function JetStyleManagerMeta(){
 			ReactDOM.render( ( <div dangerouslySetInnerHTML= {{ __html:readyFontLinks }} /> ), document.getElementById('jet-sm-gb-fonts') );
 		}
 
-		dispatch('core/editor').editPost( { meta: Object.assign( {}, postMeta, updPostMeta ) } );
+		const oldMeta = select('core/editor').getEditedPostAttribute('meta');
+		dispatch('core/editor').editPost( { meta: Object.assign( {}, oldMeta, updPostMeta ) } );
 	}
 }
 

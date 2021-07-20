@@ -174,6 +174,10 @@ class BaseControl{
 				controlType : args.type,
 			};
 
+		if ( ! window.jetSmControlsValues ) {
+			window.jetSmControlsValues = {};
+		}
+
 		if( ! window.jetSmControlsValues[ blockID ] ){
 			window.jetSmControlsValues[ blockID ] = {};
 		}
