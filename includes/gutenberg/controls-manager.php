@@ -53,7 +53,7 @@ class Controls_Manager {
 
 	public function init_font_manager(){
 		if ( is_admin() && empty( self::$fonts ) ){
-			self::$fonts = array_merge( $this->fonts_manager->get_fonts('standard'), $this->fonts_manager->get_fonts('google') );
+			self::$fonts = array_merge( $this->fonts_manager->get_fonts('standart'), $this->fonts_manager->get_fonts('google') );
 		}
 	}
 

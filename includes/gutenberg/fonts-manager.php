@@ -60,7 +60,7 @@
 		 */
 		public function get_fonts_data( $font_type ) {
 			$fonts_sources = apply_filters( 'jet_style_manager/gutenberg/fonts_sources', array(
-				'standard' => $this->path . 'assets/fonts/standard.json',
+				'standart' => $this->path . 'assets/fonts/standard.json',
 				'google'   => 'https://api.crocoblock.com/?action=get_google_fonts',
 			), $this );
 
@@ -176,7 +176,7 @@
 				delete_transient( 'jet_sm_google_fonts' );
 				$response = false;
 			}
-
+			
 			if( ! $response ){
 				$response = wp_remote_get( $url );
 
@@ -186,9 +186,14 @@
 					432000 //5 days
 				);
 			}
-
-			$json = $response['body'] ? json_decode( $response['body'], true ) : false ;
-			$json = $json ? $json['data']['fonts'] : false ;
+			
+			if( isset( $response['body'] ) ){
+				$json = $response['body'] ? json_decode( $response['body'], true ) : false ;
+				$json = $json ? $json['data']['fonts'] : false ;
+			}else{
+				$fonts_url = $this->get_fonts_data( 'standart' );
+				$json      = $this->get_file( $fonts_url );
+			}
 
 			return $json;
 		}
