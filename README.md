@@ -1,5 +1,9 @@
 # Jet Style Manager
 
+## 1.3.0
+* FIX: Saving post meta
+* FIX: Font manager
+
 ## 1.2.0
 * ADD: Integrated google fonts in typography control
 

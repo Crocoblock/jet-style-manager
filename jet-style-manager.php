@@ -3,7 +3,7 @@
  * Plugin Name: JetStyleManager
  * Plugin URI:  https://crocoblock.com
  * Description: Style manager for Crocoblock plugins
- * Version:     1.2.0
+ * Version:     1.3.0
  * Author:      Crocoblock
  * Author URI:  https://crocoblock.com
  * Text Domain: jet-styles-manager
@@ -17,7 +17,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die();
 }
 
-define( 'JET_SM_VERSION', '1.2.0' );
+define( 'JET_SM_VERSION', '1.3.0' );
 define( 'JET_SM__FILE__', __FILE__ );
 define( 'JET_SM_PLUGIN_BASE', plugin_basename( JET_SM__FILE__ ) );
 define( 'JET_SM_PATH', plugin_dir_path( JET_SM__FILE__ ) );
