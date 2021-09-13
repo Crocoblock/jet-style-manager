@@ -157,7 +157,7 @@
 			}
 
 			if ( ! $json ) {
-				return new WP_Error( 'reading_error', 'Error when reading file' );
+				return new \WP_Error( 'reading_error', 'Error when reading file' );
 			}
 
 			$content = is_array( $json ) ? $json : json_decode( $json, true );

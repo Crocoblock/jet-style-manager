@@ -1,4 +1,6 @@
 # Jet Style Manager
+## 1.3.1
+* FIX: WP error in font manager
 
 ## 1.3.0
 * FIX: Saving post meta
