@@ -169,7 +169,7 @@
 		 * @return array
 		 */
 		public function get_request( $url ){
-			//delete_transient('jet_sm_google_fonts');
+			delete_transient('jet_sm_google_fonts');
 			$response = get_transient( 'jet_sm_google_fonts' );
 
 			if ( is_wp_error( $response ) ) {
@@ -187,7 +187,7 @@
 				);
 			}
 			
-			if( isset( $response['body'] ) ){
+			if( ! is_wp_error( $response ) && isset( $response['body'] ) ){
 				$json = $response['body'] ? json_decode( $response['body'], true ) : false ;
 				$json = $json ? $json['data']['fonts'] : false ;
 			}else{
