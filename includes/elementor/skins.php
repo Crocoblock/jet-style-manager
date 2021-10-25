@@ -307,13 +307,13 @@ class Skins {
 
 	public function sanitize( $source = null ) {
 		if ( ! is_array( $source ) ) {
-			return esc_attr( $source );
+			return $source;
 		}
-
+		
 		$result = array();
 
 		foreach ( $source as $key => $value ) {
-
+	
 			switch ( gettype( $value ) ) {
 				case 'array':
 				case 'object':
@@ -322,12 +322,8 @@ class Skins {
 					}
 				break;
 
-				case 'string':
-					$value = sanitize_text_field( $value );
-				break;
-
 				default:
-					$value = esc_attr( $value );
+					$value = sanitize_text_field( $value );
 				break;
 			}
 

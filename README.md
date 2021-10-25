@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.3.3
+* UPD: sanitize function
+
 ## 1.3.2
 * FIX: WP error in font manager
 

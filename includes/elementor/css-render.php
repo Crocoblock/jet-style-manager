@@ -57,7 +57,7 @@ class CSS_Render {
 		$css = ob_get_clean();
 		//$css = str_replace( '.elementor .elementor-inner', '#elementor.elementor .elementor-inner', $css );
 
-		echo $css;
+		printf( '%s', $css );
 
 		$this->enqueue_hidden_fonts( array( 'post_id' => $post_id ) );
 		\Elementor\Plugin::$instance->frontend->print_fonts_links();
