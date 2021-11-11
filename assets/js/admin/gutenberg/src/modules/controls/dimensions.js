@@ -20,6 +20,7 @@ class Dimensions extends BaseControl {
 			label: '',
 			separator: 'none',
 			hide_label_from_vision: false,
+			input_props: {},
 			help: '',
 			units: [
 				{ value: 'px', label: 'px', default: 0 },
@@ -75,20 +76,44 @@ class Dimensions extends BaseControl {
 		return units;
 	}
 
+	sanitizeProps( props ) {
+
+		if ( props.min ) {
+			props.min = this.filterNum( props.min );
+		}
+
+		if ( props.max ) {
+			props.max = this.filterNum( props.max );
+		}
+
+		return props;
+	}
+
+	filterNum( value ) {
+		if ( /^[-+]?(\d+|Infinity)$/.test( value ) ) {
+			return Number( value );
+		} else {
+			return 0;
+		}
+	}
+
 	renderControl(){
 		let {
-			units
+			units,
+			input_props
 		} = this.args;
 
 		let value = Object.assign( {}, this.attributes.default.value, this.getValue() );
 
-		units = this.parseUnits( units );
+		units       = this.parseUnits( units );
+		input_props = this.sanitizeProps( input_props );
 
 		return (
 			<BoxControl
 				values = { value }
 				units = { units }
 				label = { "" }
+				inputProps = { input_props }
 				onChange ={ ( newValue ) => { this.setValue( newValue ); } }
 			/>
 		);
