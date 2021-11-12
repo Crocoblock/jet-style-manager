@@ -307,7 +307,7 @@ class Skins {
 
 	public function sanitize( $source = null ) {
 		if ( ! is_array( $source ) ) {
-			return $source;
+			return sanitize_textarea_field( $source );
 		}
 		
 		$result = array();
