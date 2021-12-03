@@ -17,6 +17,7 @@ JetStyleManager is a plugin that extends the functionalities of Gutenberg. Combi
 = Compatible plugins =
 - <a href="https://wordpress.org/plugins/jetformbuilder/">JetFormBuilder — form builder for Gutenberg</a>
 - <a href="https://crocoblock.com/plugins/jetsmartfilters-gutenberg/?utm_source=wpordpress&utm_campaign=jetstylemanager">JetSmartFilters. Advanced filters for any post type</a>
+- <a href="https://crocoblock.com/plugins/jetengine-gutenberg/?utm_source=wpordpress&utm_campaign=jetstylemanager">JetEngine. Everything for dynamic content in the block editor</a>
 - more coming soon...
 
 = For developers =
