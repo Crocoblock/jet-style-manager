@@ -1,5 +1,11 @@
 # Jet Style Manager
 
+## 1.3.5
+* UPD: allow to prevent wrapping blocks which implement SM class from own side
+
+## 1.3.4
+* FIX: better data sanitizing
+
 ## 1.3.3
 * UPD: sanitize function
 
