@@ -27,18 +27,24 @@ class Style_Manager {
 	}
 
 	public function wrap_block( $block_content, $block ) {
+
 		if( ! $block['blockName'] ){
 			return $block_content;
 		}
 
 		$blockName = $block['blockName'];
 
-		if( ! empty( $block['attrs']['blockID'] ) && ( array_key_exists( $blockName, Controls_Manager::$controls ) || array_key_exists( $blockName, Controls_Manager::$style_controls ) ) ){
-			$attr    = $block['attrs'];
-			$blockID = $attr['blockID'];
+		if ( apply_filters( 'jet_style_manager/gutenberg/prevent_block_wrap/' . $blockName, false ) ) {
+			return $block_content;
+		}
 
-			$className     = apply_filters( $blockName . '/class-name', isset( $attr['className'] ) ? $attr['className'] : $blockID );
-			$filter_id     = ! empty( $attr['filter_id'] ) ? 'data-id="' . $attr['filter_id'] . '"' : '';
+		if( ! empty( $block['attrs']['blockID'] ) && ( array_key_exists( $blockName, Controls_Manager::$controls ) || array_key_exists( $blockName, Controls_Manager::$style_controls ) ) ){
+
+			$attr      = $block['attrs'];
+			$blockID   = $attr['blockID'];
+			$className = apply_filters( $blockName . '/class-name', isset( $attr['className'] ) ? $attr['className'] : $blockID );
+			$filter_id = ! empty( $attr['filter_id'] ) ? 'data-id="' . $attr['filter_id'] . '"' : '';
+
 			$format        = apply_filters( 'jet_style_manager/gutenberg/block_wrapper_format', '<div class="%1$s" data-block-id="%2$s" %3$s>%4$s</div>' );
 			$block_content = sprintf( $format, $className, $blockID, $filter_id, $block_content );
 		}
