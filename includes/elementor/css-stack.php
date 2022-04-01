@@ -131,8 +131,8 @@ class CSS_Stack {
 
 		$css_file->add_controls_stack_style_rules(
 			$element,
-			$element->get_style_controls( null, $element->get_parsed_dynamic_settings() ),
-			$element->get_settings(),
+			$css_file->get_style_controls( $element ),
+			$element->get_active_settings(),
 			array( '{{ID}}', '{{WRAPPER}}' ),
 			array( $element->get_id(), $unique_selector )
 		);

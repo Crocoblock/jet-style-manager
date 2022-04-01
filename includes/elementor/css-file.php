@@ -126,7 +126,7 @@ class CSS_File extends \Elementor\Core\Files\CSS\Base {
 
 				$this->add_controls_stack_style_rules(
 					$ch_element,
-					$ch_element->get_style_controls( null, $ch_element->get_parsed_dynamic_settings() ),
+					$this->get_style_controls( $ch_element ),
 					$element_settings,
 					array( '{{ID}}', '{{WRAPPER}}' ),
 					array( $ch_element->get_id(), $this->get_element_unique_selector( $ch_element ) )
