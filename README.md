@@ -2,6 +2,7 @@
 
 ## 1.3.5
 * UPD: allow to prevent wrapping blocks which implement SM class from own side
+* FIX: Elementor compatibility
 
 ## 1.3.4
 * FIX: better data sanitizing
