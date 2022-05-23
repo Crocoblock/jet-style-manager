@@ -125,7 +125,8 @@ class Style_Manager {
 		return $meta;
 	}
 
-	public function render_blocks_style( $ID = false, $format = '<style class="jet-sm-gb-style">%s</style>' ){
+	public function render_blocks_style( $ID = false, $format = '<style class="jet-sm-gb-style">%s</style>' ) {
+
 		$style = $this->get_blocks_style( $ID );
 
 		if( $style ){
