@@ -1,4 +1,5 @@
 <?php
+
 namespace JET_SM\Gutenberg;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,7 +29,7 @@ class Style_Manager {
 
 	public function wrap_block( $block_content, $block ) {
 
-		if( ! $block['blockName'] ){
+		if ( ! $block['blockName'] ) {
 			return $block_content;
 		}
 
@@ -38,7 +39,9 @@ class Style_Manager {
 			return $block_content;
 		}
 
-		if( ! empty( $block['attrs']['blockID'] ) && ( array_key_exists( $blockName, Controls_Manager::$controls ) || array_key_exists( $blockName, Controls_Manager::$style_controls ) ) ){
+		if ( ! empty( $block['attrs']['blockID'] ) &&
+		     Controls_Stack::get_instance()->has_controls( $blockName )
+		) {
 
 			$attr      = $block['attrs'];
 			$blockID   = $attr['blockID'];
@@ -52,7 +55,7 @@ class Style_Manager {
 		return $block_content;
 	}
 
-	public function register_meta(){
+	public function register_meta() {
 		register_meta(
 			'post',
 			'_jet_sm_ready_style',
@@ -114,7 +117,7 @@ class Style_Manager {
 		);
 	}
 
-	public function get_meta(){
+	public function get_meta() {
 		$meta = get_metadata(
 			'post',
 			get_the_ID(),
@@ -129,15 +132,15 @@ class Style_Manager {
 
 		$style = $this->get_blocks_style( $ID );
 
-		if( $style ){
+		if ( $style ) {
 			printf( $format, $style );
 		}
 	}
 
-	public function render_blocks_fonts( $ID = false ){
+	public function render_blocks_fonts( $ID = false ) {
 		$fonts = $this->get_blocks_fonts( $ID );
 
-		if( $fonts ){
+		if ( $fonts ) {
 			$fonts = trim( $fonts, '"' );
 			$fonts = wp_unslash( $fonts );
 
@@ -145,41 +148,41 @@ class Style_Manager {
 		}
 	}
 
-	public function get_blocks_style( $ID = false ){
+	public function get_blocks_style( $ID = false ) {
 		global $post;
 
-		if( ! $ID && isset( $post ) ){
+		if ( ! $ID && isset( $post ) ) {
 
 			$ID = $post->ID;
 		}
 
-		if( ! $ID ){
+		if ( ! $ID ) {
 			return false;
 		}
 
 		$style = get_post_meta( $ID, self::STYLE_META_SLUG, true );
 
-		return ! empty( $style ) ? $style : false ;
+		return ! empty( $style ) ? $style : false;
 	}
 
-	public function get_blocks_fonts( $ID = false ){
+	public function get_blocks_fonts( $ID = false ) {
 		global $post;
 
-		if( ! $ID && isset( $post ) ){
+		if ( ! $ID && isset( $post ) ) {
 
 			$ID = $post->ID;
 		}
 
-		if( ! $ID ){
+		if ( ! $ID ) {
 			return false;
 		}
 
 		$fonts = get_post_meta( $ID, self::FONTS_SLUG, true );
 
-		return ! empty( $fonts ) ? $fonts : false ;
+		return ! empty( $fonts ) ? $fonts : false;
 	}
 
-	public function render_editor_block_style(){
+	public function render_editor_block_style() {
 		echo '<div id="jet-sm-gb-style"></div>';
 		echo '<div id="jet-sm-gb-fonts"></div>';
 	}
@@ -188,7 +191,7 @@ class Style_Manager {
 		return true;
 	}
 
-	public function sanitize_callback( $meta_value, $meta_key, $object_type ){
+	public function sanitize_callback( $meta_value, $meta_key, $object_type ) {
 		return $meta_value;
 	}
 
