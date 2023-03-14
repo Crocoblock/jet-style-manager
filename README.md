@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.3.6
+* FIX: Allowed memory exhausted in block editor (improving optimization)
+
 ## 1.3.5
 * UPD: allow to prevent wrapping blocks which implement SM class from own side
 * FIX: Elementor compatibility
