@@ -4,24 +4,20 @@
 	"license": "GPL-2.0-or-later",
 	"main": "assets/dev/js/main.js",
 	"devDependencies": {
-		"@babel/plugin-proposal-object-rest-spread": "^7.5.5",
-		"babel-core": "^6.25.0",
-		"babel-loader": "^7.1.1",
-		"babel-plugin-transform-object-rest-spread": "^6.26.0",
-		"babel-plugin-transform-react-jsx": "^6.24.1",
-		"babel-plugin-transform-runtime": "^6.23.0",
-		"babel-preset-env": "^1.6.0",
-		"babel-preset-latest": "^6.24.1",
-		"cross-env": "^5.0.5",
-		"css-loader": "^1.0.0",
-		"file-loader": "^1.1.4",
-		"node-sass": "^4.7.2",
-		"sass-loader": "^6.0.6",
-		"webpack": "^3.6.0"
+		"@babel/core": "^7.14.3",
+		"@babel/plugin-proposal-class-properties": "^7.13.0",
+		"@babel/plugin-transform-react-jsx": "^7.14.3",
+		"@babel/preset-env": "^7.14.2",
+		"babel-loader": "^9.1.3",
+		"css-loader": "^5.2.6",
+		"sass": "^1.60.0",
+		"sass-loader": "^11.1.1",
+		"webpack": "^5.37.1",
+		"webpack-cli": "^4.7.0"
 	},
 	"scripts": {
-		"dev": "cross-env NODE_ENV=development webpack --progress --hide-modules -w",
-		"build": "cross-env NODE_ENV=production webpack --progress --hide-modules -w"
+		"dev": "webpack --mode development --progress -w",
+		"build": "webpack --mode production --progress"
 	},
 	"dependencies": {
 		"@wordpress/blocks": "^6.20.3",

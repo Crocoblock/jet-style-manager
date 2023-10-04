@@ -24,7 +24,6 @@ function JetStyleManagerMeta(){
 	if ( Object.keys( blockStyle )[0] ) {
 		parsedFontsCollection( fontsCollection );
 		renderStyle( blockStyle );
-		select( 'core/editor' ).isEditedPostAutosaveable = () => false;
 	}
 
 	document.addEventListener( 'jet-sm-update-meta', debounce( setMeta, 50 ) );
@@ -421,8 +420,8 @@ function JetStyleManagerMeta(){
 			ReactDOM.render( ( <div dangerouslySetInnerHTML= {{ __html:readyFontLinks }} /> ), document.getElementById('jet-sm-gb-fonts') );
 		}
 
-		const oldMeta = select('core/editor').getEditedPostAttribute('meta');
-		dispatch('core/editor').editPost( { meta: Object.assign( {}, oldMeta, updPostMeta ) } );
+		// const oldMeta = select('core/editor').getEditedPostAttribute('meta');
+		// dispatch('core/editor').editPost( { meta: Object.assign( {}, oldMeta, updPostMeta ) } );
 	}
 }
 

@@ -10,12 +10,6 @@ const {
 
 class StartTabs extends BaseControl {
 
-	constructor( args ) {
-		super( args );
-
-		return args.id;
-	}
-
 	setDefaultArgs() {
 		this.args = {
 			class_name: 'jet-st-tabs',

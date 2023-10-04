@@ -12,10 +12,6 @@ const { __ } = wp.i18n;
 
 class Select extends BaseControl {
 
-	constructor( args ) {
-		super( args );
-	}
-
 	setDefaultArgs() {
 		this.args = {
 			class_name: 'jet-st-select-control',

@@ -1,48 +1,30 @@
-var path = require('path');
-var webpack = require('webpack');
+const path    = require( 'path' );
+const webpack = require( 'webpack' );
 
 module.exports = {
+	name: 'jet-style-manager-gutenberg',
+	context: path.resolve( __dirname, 'src' ),
 	entry: {
-		jet_sm_gb: './src/main.js',
+		'jet-sm-gb': './main.js',
 	},
 	output: {
-		path: __dirname,
-		filename: 'jet-sm-gb.js',
+		path: path.resolve( __dirname ),
+		filename: '[name].js',
 	},
-	watch: true,
-	module: {
-		rules: [{
-				test: /\.(js|jsx|mjs)$/,
-				exclude: /(node_modules|bower_components)/,
-				use: {
-					loader: 'babel-loader',
-				},
-			}
-		],
-	},
+	devtool: 'source-map',
 	resolve: {
 		modules: [
-			path.resolve(__dirname, 'src'),
-			'node_modules'
+			'node_modules',
 		],
-	}
+		extensions: [ '.js' ],
+	},
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				loader: 'babel-loader',
+				exclude: /node_modules/,
+			},
+		],
+	},
 };
-
-if (process.env.NODE_ENV === 'production') {
-	module.exports.plugins = (module.exports.plugins || []).concat([
-		new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: '"production"'
-			}
-		}),
-		new webpack.optimize.UglifyJsPlugin({
-			sourceMap: false,
-			compress: {
-				warnings: false
-			}
-		}),
-		new webpack.LoaderOptionsPlugin({
-			minimize: true
-		})
-	])
-}
