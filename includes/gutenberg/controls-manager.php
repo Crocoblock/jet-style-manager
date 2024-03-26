@@ -84,20 +84,20 @@ class Controls_Manager {
 
 	public function start_section( $control_stack = 'controls', $args = [] ) {
 		$id = $this->_get_section_id( $args );
-		do_action( "jet-sm/controls/" . $this->block_slug . "/${id}/before_start", $this );
+		do_action( "jet-sm/controls/" . $this->block_slug . "/{$id}/before_start", $this );
 
 		$this->start_wrapper( $control_stack, $args, 'section' );
 
-		do_action( "jet-sm/controls/" . $this->block_slug . "/${id}/after_start", $this );
+		do_action( "jet-sm/controls/" . $this->block_slug . "/{$id}/after_start", $this );
 	}
 
 	public function end_section() {
 		$id = $this->_get_section_id();
-		do_action( "jet-sm/controls/" . $this->block_slug . "/${id}/before_end", $this );
+		do_action( "jet-sm/controls/" . $this->block_slug . "/{$id}/before_end", $this );
 
 		$this->end_wrapper( 'section' );
 
-		$action = "jet-sm/controls/" . $this->block_slug . "/${id}/after_end";
+		$action = "jet-sm/controls/" . $this->block_slug . "/{$id}/after_end";
 
 		$this->_clear_section_id();
 		do_action( $action, $this );

@@ -28,6 +28,13 @@
 		public $args = array();
 
 		/**
+		 * Fonts base path
+		 * 
+		 * @var string
+		 */
+		public $path = '';
+
+		/**
 		 * Module directory URI.
 		 *
 		 * @since 1.0.0
