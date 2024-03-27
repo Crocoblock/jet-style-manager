@@ -28,6 +28,7 @@ class Plugin {
 	public $styles_handler;
 	public $compatibility;
 	public $skins;
+	public $css_stack;
 
 	/**
 	 * Plugin constructor.
