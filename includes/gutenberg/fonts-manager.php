@@ -135,11 +135,38 @@
 			$fonts_url = $this->get_fonts_data( $font_type );
 
 			if( $fonts_url ) {
-				$fonts = $this->read_font_file( $fonts_url );
 
-				if ( is_array( $fonts ) ) {
-					$this->fonts = $this->satizite_font_family( $fonts );
+				if ( 'google' === $font_type ) {
+
+					$fonts = get_transient( 'jet_sm_google_fonts' );
+
+					if ( ! $fonts ) {
+						
+						$fonts = $this->read_font_file( $fonts_url );
+
+						if ( is_array( $fonts ) ) {
+							$fonts = $this->satizite_font_family( $fonts );
+						}
+
+						set_transient(
+							'jet_sm_google_fonts',
+							$fonts,
+							432000 //5 days
+						);
+
+					}
+
+					$this->fonts = $fonts;
+
+				} else {
+					$fonts = $this->read_font_file( $fonts_url );
+
+					if ( is_array( $fonts ) ) {
+						$this->fonts = $this->satizite_font_family( $fonts );
+					}
+
 				}
+
 			}
 
 			$this->fonts = apply_filters( 'jet_style_manager/gutenberg/fonts_list', $this->fonts, $this );
@@ -175,9 +202,7 @@
 		/**
 		 * @return array
 		 */
-		public function get_request( $url ){
-			delete_transient('jet_sm_google_fonts');
-			$response = get_transient( 'jet_sm_google_fonts' );
+		public function get_request( $url ) {
 
 			if ( is_wp_error( $response ) ) {
 				delete_transient( 'jet_sm_google_fonts' );
@@ -186,12 +211,6 @@
 			
 			if( ! $response ){
 				$response = wp_remote_get( $url );
-
-				set_transient(
-					'jet_sm_google_fonts',
-					$response,
-					432000 //5 days
-				);
 			}
 			
 			if( ! is_wp_error( $response ) && isset( $response['body'] ) ){
