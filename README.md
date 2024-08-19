@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.3.7
+* UPD: Optimize fonts cache.
+
 ## 1.3.6
 * FIX: Allowed memory exhausted in block editor (improving optimization)
 
