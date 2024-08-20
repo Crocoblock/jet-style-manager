@@ -140,8 +140,8 @@
 
 					$fonts = get_transient( 'jet_sm_google_fonts' );
 
-					if ( ! $fonts ) {
-						
+					if ( ! $fonts || isset( $fonts['body'] ) ) {
+
 						$fonts = $this->read_font_file( $fonts_url );
 
 						if ( is_array( $fonts ) ) {
