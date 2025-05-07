@@ -140,7 +140,7 @@
 
 					$fonts = get_transient( 'jet_sm_google_fonts' );
 
-					if ( ! $fonts || isset( $fonts['body'] ) ) {
+					if ( ! $fonts || is_wp_error( $fonts ) || isset( $fonts['body'] ) ) {
 
 						$fonts = $this->read_font_file( $fonts_url );
 
