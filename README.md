@@ -1,5 +1,8 @@
 # Jet Style Manager
 
+## 1.3.9
+* FIX: Ensure all AJAX requests have proper CSRF protection (thanks to Huynh Kien Minh for the report).
+
 ## 1.3.8
 * FIX: Prevent PHP errors.
 

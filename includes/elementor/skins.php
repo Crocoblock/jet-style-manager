@@ -17,6 +17,8 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Skins {
 
+	const AJAX_NONCE_ACTION = 'jet_sm_skins';
+
 	private $rendered_skins = array();
 
 	/**
@@ -140,14 +142,29 @@ class Skins {
 	}
 
 	/**
+	 * Verify that a skin AJAX request is authorized and originates from the editor.
+	 *
+	 * @return void
+	 */
+	private function verify_ajax_request() {
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'You don\'t have permissions to do this' ), 403 );
+		}
+
+		if ( ! check_ajax_referer( self::AJAX_NONCE_ACTION, 'nonce', false ) ) {
+			wp_send_json_error( array( 'message' => 'Security check failed' ), 403 );
+		}
+
+	}
+
+	/**
 	 * Load preview CSS
 	 * @return [type] [description]
 	 */
 	public function load_preview_skin_css() {
 
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'You don\'t have permissions to do this' ) );
-		}
+		$this->verify_ajax_request();
 
 		$skins = $_REQUEST['skins'] ? $this->sanitize( json_decode( wp_unslash( $_REQUEST['skins'] ), true ) ) : array();
 		$skins = array_map( function( $item ) {
@@ -184,9 +201,7 @@ class Skins {
 	 */
 	public function apply_skin() {
 
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
-		}
+		$this->verify_ajax_request();
 
 		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 		$skin   = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
@@ -216,9 +231,7 @@ class Skins {
 	 */
 	public function get_skins_for_widget() {
 
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
-		}
+		$this->verify_ajax_request();
 
 		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 
@@ -241,9 +254,7 @@ class Skins {
 	 */
 	public function delete_skin() {
 
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'You don\'t have permissions to deleting skins' ) );
-		}
+		$this->verify_ajax_request();
 
 		$widget = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 		$skin   = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
@@ -263,9 +274,7 @@ class Skins {
 	 */
 	public function save_skin() {
 
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array( 'message' => 'You don\'t have permissions to saving skins' ) );
-		}
+		$this->verify_ajax_request();
 
 		$widget   = $_REQUEST['widget'] ? sanitize_key( $_REQUEST['widget'] ) : false;
 		$name     = $_REQUEST['name'] ? sanitize_text_field( $_REQUEST['name'] ) : false;
@@ -357,6 +366,14 @@ class Skins {
 			array(),
 			JET_SM_VERSION . time(),
 			true
+		);
+
+		wp_localize_script(
+			'jet-sm-editor',
+			'JetSMAjax',
+			array(
+				'nonce' => wp_create_nonce( self::AJAX_NONCE_ACTION ),
+			)
 		);
 
 		wp_enqueue_style(

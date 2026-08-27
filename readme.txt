@@ -4,7 +4,7 @@ Tags: blocks, gutenberg, style, styles manager
 Requires at least: 5.6
 Tested up to: 6.6.1
 Requires PHP: 7.2
-Stable tag: 1.3.8
+Stable tag: 1.3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,15 @@ Guide how to integrate JetStyleManager into your blocks plugins you can find <a 
 Please, feel free to <a href="https://github.com/Crocoblock/jet-style-manager/issues" target="_blank">ask any questions</a> about your plugin integration.
 
 == Changelog ==
+
+## 1.3.9
+* FIX: Ensure all AJAX requests have proper CSRF protection (thanks to Huynh Kien Minh for the report).
+
+## 1.3.8
+* FIX: Prevent PHP errors.
+
+## 1.3.7
+* UPD: Optimize fonts cache.
 
 **1.3.6**
  - FIX: Allowed memory exhausted in block editor (improving optimization)

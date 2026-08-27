@@ -30,17 +30,6 @@ class DB {
 	public $latest_result = null;
 
 	/**
-	 * Constructor for the class
-	 */
-	public function __construct() {
-
-		if ( ! empty( $_GET['jet_sm_install_table'] ) ) {
-			$this->install_table();
-		}
-
-	}
-
-	/**
 	 * Check if booking table alredy exists
 	 *
 	 * @return boolean [description]
@@ -60,21 +49,6 @@ class DB {
 		}
 
 		return $this->table_exists;
-	}
-
-	/**
-	 * Try to recreate DB table by request
-	 *
-	 * @return void
-	 */
-	public function install_table() {
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		self::create_db_table();
-
 	}
 
 	/**

@@ -68,6 +68,7 @@
 					dataType: 'json',
 					data: {
 						action: 'jet_sm_load_skins_css',
+						nonce: window.JetSMAjax.nonce,
 						skins: JSON.stringify( window.JetSMRenderedSkins ),
 					},
 				}).done( function( response ) {
@@ -144,6 +145,7 @@
 				dataType: 'json',
 				data: {
 					action: 'jet_sm_save_skin',
+					nonce: window.JetSMAjax.nonce,
 					name: skinName,
 					widget: widget,
 					values: JSON.stringify( values ),
@@ -171,6 +173,7 @@
 				dataType: 'json',
 				data: {
 					action: 'jet_sm_delete_skin',
+					nonce: window.JetSMAjax.nonce,
 					name: skinName,
 					widget: JetSM.currentElement.model.attributes.widgetType,
 				},
@@ -203,6 +206,7 @@
 				dataType: 'json',
 				data: {
 					action: 'jet_sm_apply_skin',
+					nonce: window.JetSMAjax.nonce,
 					name: skinName,
 					widget: JetSM.currentElement.model.attributes.widgetType,
 				},
@@ -259,6 +263,7 @@
 				dataType: 'json',
 				data: {
 					action: 'jet_sm_get_skins_for_widget',
+					nonce: window.JetSMAjax.nonce,
 					widget: JetSM.currentElement.model.attributes.widgetType,
 				},
 			}).done( function( response ) {
